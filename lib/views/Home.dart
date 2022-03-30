@@ -4,7 +4,7 @@ import 'package:charts_flutter/flutter.dart' as Charts;
 import 'package:intl/intl.dart';
 
 // import 'package:timesheet/daos/ProjectDAO.dart';
-// import 'package:timesheet/models/Project.dart';
+// import 'package:timesheet/models/ProjectDataModel.dart';
 // import 'package:timesheet/models/TimesheetUser.dart';
 // import 'package:timesheet/daos/TimesheetTable.dart';
 // import 'package:timesheet/views/ToDo.dart';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
+import 'package:timestory_back4app/converters/UserParseObjectConverter.dart';
+import 'package:timestory_back4app/model/UserDataModel.dart';
 import 'package:timestory_back4app/util/Utilities.dart';
 
 import 'Projects.dart';
@@ -21,6 +23,7 @@ class _ProfileState extends State<Profile> {
   var imgUrl ="";
   var name = "";
   var email = "";
+  var util = Utilities();
 
   @override
   void initState() {
@@ -29,13 +32,19 @@ class _ProfileState extends State<Profile> {
   }
 
   getUserData() async {
+    var uToPoConv = UserParseObjectConverter();
     final timeStoryUser = await ParseUser.currentUser() as ParseUser;
+    debugPrint("Profile - $timeStoryUser");
+    UserDataModel x = uToPoConv.parseObjectToDomain(timeStoryUser); //Not getting user values here
+    debugPrint("Profile - Username - ${x.username}");
+
     setState(() {
       isLoggedIn = true;
-      imgUrl = timeStoryUser.get("photoUrl");
-      name = timeStoryUser.get("username");
-      email = timeStoryUser.get("email");
-      debugPrint(email);
+      imgUrl = x.photoUrl;
+
+      name = x.username;
+      email = x.email;
+      debugPrint("Profile - Email: $email");
     });
   }
 
@@ -48,9 +57,7 @@ class _ProfileState extends State<Profile> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: () async {
-                  signOut(context);
-                },
+                onPressed: () async => util.signOut(context),
                 child: const Text('SIGN OUT', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
               ),
             ],

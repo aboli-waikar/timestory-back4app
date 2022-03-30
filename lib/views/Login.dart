@@ -17,6 +17,7 @@ class _LoginState extends State<Login> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool showPassword = true;
+  var util = Utilities();
 
   //The GlobalKey<FormState> object will be used for validating the user’s entered email and password, and both of the TextEditingControllers are used for tracking changes to those text fields. The last two attributes, _success and _userEmail, will be used to keep track of state for this screen.
 
@@ -96,7 +97,7 @@ class _LoginState extends State<Login> {
                               child: const Text('Submit'),
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  await signIn(context, _usernameController.text, _passwordController.text, null);
+                                  await util.signIn(context, _usernameController.text, _passwordController.text, null);
                                 }
                               }),
                         ),
@@ -121,7 +122,7 @@ class _LoginState extends State<Login> {
                               ),
                             ),
                             onTap: () async {
-                              await signInWithGoogle(context);
+                              await util.signInWithGoogle(context);
                             },
                           ),
                         ),

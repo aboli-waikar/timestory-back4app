@@ -1,117 +1,105 @@
+import 'dart:core';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
-import 'package:timestory_back4app/converters/ProjectToParseObjectConverter.dart';
-import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
-import 'dart:core';
+import 'package:timestory_back4app/converters/ProjectParseObjectConverter.dart';
+import 'package:timestory_back4app/model/ProjectDataModel.dart';
+import '../converters/UserParseObjectConverter.dart';
+import 'package:timestory_back4app/util/Utilities.dart';
 
 class Projects extends StatefulWidget {
-  const Projects({Key? key}) : super(key: key);
+  Projects({Key? key}) : super(key: key);
 
   @override
   ProjectsState createState() => ProjectsState();
+
+  var pToPoConv = ProjectParseObjectConverter();
+
+  Future<String?>? getUser() async {
+    var uToPoConv = UserParseObjectConverter();
+    final timeStoryUser = await ParseUser.currentUser() as ParseUser;
+    var user = uToPoConv.parseObjectToDomain(timeStoryUser);
+    var userid = user.objectId;
+    return userid;
+  }
+
+  void addProject(ProjectDataModel pdmReceived) async {
+    debugPrint("In Add Project");
+    String? userId = await getUser();
+    ProjectDataModel pdm = ProjectDataModel("", userId!, pdmReceived.projectId, pdmReceived.name, pdmReceived.company, pdmReceived.hourlyRate,
+        pdmReceived.currency);
+    debugPrint("Pdm: ${pdm.toString()}");
+    // ParseObject ppo = pToPoConv.domainToNewParseObject(pdm);
+
+    var ppo = ParseObject('Project')
+    ..set('objectId',"")
+    ..set('userId', (ParseObject('User')..objectId = userId).toPointer())
+    ..set('projectId', pdm.projectId)
+    ..set('name', pdm.name)
+    ..set('company', pdm.company)
+    ..set('hourlyRate', pdm.hourlyRate)
+    ..set('currency', pdm.currency);
+    debugPrint("ppo: ${ppo.toString()}");
+    await ppo.save();
+
+    //debugPrint("Add Project ApiResponse: ${apiResponse.results.toString()}");
+    //return apiResponse;
+    //if(apiResponse.success && apiResponse.results != null){
+    // if (apiResponse.success) {
+    //   var message = "Project successfully created.";
+    //   util.showMessage(context, message);
+    //   return apiResponse.results;
+    // } else {
+    //   var message = apiResponse.error!.message;
+    //   util.showMessage(context, message);
+    // }
+  }
 }
 
 class ProjectsState extends State<Projects> {
+  var pToPoConv = ProjectParseObjectConverter();
 
-  var pToPoConv = ProjectToParseObjectConverter();
+  var util = Utilities();
 
-  TextEditingController projectNameController = TextEditingController();
-  TextEditingController projectCompanyController = TextEditingController();
-  TextEditingController projectHourlyRateController = TextEditingController();
-
-  //
-  // @override
-  // initState() {
-  //   super.initState();
+  // getUser() async {
+  //   var uToPoConv = UserParseObjectConverter();
+  //   final timeStoryUser = await ParseUser.currentUser() as ParseUser;
+  //   var user = uToPoConv.parseObjectToDomain(timeStoryUser);
+  //   var userid = user.objectId;
+  //   return userid;
   // }
 
   getProject() async {
     final apiResponse = await ParseObject('Project').getAll();
-    debugPrint("ApiResponse: ${apiResponse.results.toString()}");
-    debugPrint("Project - getProject()");
-
+    debugPrint("Projects ApiResponse: ${apiResponse.results.toString()}");
     if (apiResponse.success && apiResponse.results != null) {
-      // var pl = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => pToPoConv.fromParseObject(po)).toList().map((p) => p.name);
-      var pns = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => pToPoConv.fromParseObject(po)).toList().map((p) => p.name);
+      var pns = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => pToPoConv.parseObjectToDomain(po)).toList().map((p) => p.name);
       debugPrint(pns.toString());
       debugPrint(pns.length.toString());
       return pns.toList();
-      // for (var o in apiResponse.results!) {
-      //   final project = o as ParseObject;
-      //   projectList.add(project);
-      // }
     }
-
     return [];
   }
 
-  addProject(String name, String company, num rate, String currency) async {
-    final timeStoryUser = await ParseUser.currentUser() as ParseUser;
-    var userid = timeStoryUser.get('objectId');
-
-    var project = ParseObject('Project');
-    project.set('name', name);
-    project.set('company', company);
-    project.set('hourlyRate', rate);
-    project.set('currency', currency);
-    project.set('userId', userid);
-    project.save();
-  }
+  // addProject(num id, String name, String company, num rate, String currency) async {
+  //   var userid = getUser();
+  //   var pdm = ProjectDataModel("", userid, id, name, company, rate, currency);
+  //   var ppo = pToPoConv.domainToNewParseObject(pdm);
+  //   ParseResponse apiResponse = await ppo.save();
+  //   //if(apiResponse.success && apiResponse.results != null){
+  //   if (apiResponse.success) {
+  //     var message = "Project successfully created.";
+  //     util.showMessage(context, message);
+  //     return apiResponse.results;
+  //   } else {
+  //     var message = apiResponse.error!.message;
+  //     util.showMessage(context, message);
+  //   }
+  // }
 
   editProject() {}
 
   deleteProject() {}
-
-  showProjectDialog(BuildContext context) {
-    num hourlyrate = 100;
-    //getProject();
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Project'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: projectNameController,
-                  decoration: const InputDecoration(labelText: 'Project Name'),
-                ),
-                TextField(
-                  controller: projectCompanyController,
-                  decoration: const InputDecoration(labelText: 'Company Name'),
-                ),
-                TextField(
-                  controller: projectHourlyRateController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(labelText: 'Hourly Rate'),
-                  onChanged: (value) => (hourlyrate = num.parse(value)),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton(
-                        onPressed: () {
-                          addProject(projectNameController.text, projectCompanyController.text, hourlyrate, 'INR');
-                          Navigator.pop(context);
-                          Navigator.pushAndRemoveUntil(
-                              context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar()), (route) => false);
-                        },
-                        child: const Text('Add Project')),
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                  ],
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

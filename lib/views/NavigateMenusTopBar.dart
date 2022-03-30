@@ -4,6 +4,8 @@ import 'package:timestory_back4app/views/Home.dart';
 import 'package:timestory_back4app/views/Profile.dart';
 import 'package:timestory_back4app/views/ReadTimeSheet.dart';
 
+import 'QuickAdd.dart';
+
 class NavigateMenuTopBar extends StatefulWidget {
   const NavigateMenuTopBar({Key? key}) : super(key: key);
 
@@ -19,7 +21,7 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
     ReadTimeSheet(),
     Expenses(),
     Profile(),
-    Home(),
+    QuickAdd(),
   ];
 
   @override

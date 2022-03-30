@@ -15,6 +15,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool showPassword = true;
+  var util = Utilities();
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +119,7 @@ class _SignUpState extends State<SignUp> {
                               child: const Text('Register'),
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  await signUp(context, _usernameController.text, _passwordController.text, _emailController.text);
+                                  await util.signUp(context, _usernameController.text, _passwordController.text, _emailController.text);
                                 }
                               }),
                         ),
