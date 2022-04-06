@@ -4,10 +4,15 @@ import 'package:timestory_back4app/converters/DomainParseObjectConverterInterfac
 import 'package:timestory_back4app/model/UserDataModel.dart';
 
 class UserParseObjectConverter implements DomainParseObjectConverterInterface<UserDataModel> {
+  @override
+  final String _tableName = "User";
+
+  @override
+  final String _className = "_User";
 
   @override
   ParseObject domainToNewParseObject(UserDataModel t) {
-    var user = ParseObject('User');
+    var user = ParseObject(_tableName);
     _setPOProperties(user, t);
     return user;
   }
@@ -28,6 +33,12 @@ class UserParseObjectConverter implements DomainParseObjectConverterInterface<Us
     var id = po.get<String>('objectId');
     var user = UserDataModel.fromId(id!);
     return user;
+  }
+
+  @override
+  Map domainToPointerParseObject(UserDataModel udm) {
+    Map userMap = {"__type": "Pointer", "className": _className, "objectId": udm.objectId};
+    return userMap;
   }
 
   @override

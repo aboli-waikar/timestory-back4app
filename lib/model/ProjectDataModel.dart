@@ -1,26 +1,27 @@
 import 'package:timestory_back4app/model/Domain.dart';
+import 'package:timestory_back4app/model/UserDataModel.dart';
 
 class ProjectDataModel extends Domain {
-
   @override
   final String? objectId;
-  final String userId;
+  final UserDataModel userDM;
   final num projectId;
   final String name;
   final String company;
   final num hourlyRate;
   final String currency;
 
-  ProjectDataModel.fromId(String objectId): this(objectId, "", 0, "", "", 0, "");
 
-  ProjectDataModel.withoutObjectIdUserId(String objectId, String userId): this(objectId, userId, 0, "", "", 0, "");
+  ProjectDataModel(this.objectId, this.userDM, this.projectId, this.name, this.company, this.hourlyRate, this.currency);
 
-  ProjectDataModel(this.objectId, this.userId, this.projectId, this.name, this.company, this.hourlyRate, this.currency);
+  ProjectDataModel.fromId(String objectId, UserDataModel userId) : this(objectId, userId, 0, "", "", 0, "");
 
-  static final ProjectDataModel nullObject = ProjectDataModel("", "", 0, "", "", 0, "");
+  ProjectDataModel.withObjectIdUserId(String objectId, UserDataModel userId) : this(objectId, userId, 0, "", "", 0, "");
+
+  static final ProjectDataModel nullObject = ProjectDataModel("", UserDataModel.nullObject, 0, "", "", 0, "");
 
   @override
   String toString() {
-    return "ProjectDataModel($objectId, $userId, $projectId, $name, $company, $hourlyRate, $currency)";
+    return "ProjectDataModel($objectId, $userDM, $projectId, $name, $company, $hourlyRate, $currency)";
   }
 }

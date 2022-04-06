@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:charts_flutter/flutter.dart' as Charts;
 import 'package:intl/intl.dart';
+import 'package:timestory_back4app/views/Projects.dart';
 
 // import 'package:timesheet/daos/ProjectDAO.dart';
 // import 'package:timesheet/models/ProjectDataModel.dart';
@@ -26,7 +27,7 @@ class _HomeState extends State<Home> {
   DateTime selectedMonth = DateTime.now();
   //final prDAO = ProjectDAO();
   //final tsDAO = TimesheetDAO();
-  List<String> projectList = [''];
+  List projectList = [];
   //var projectName = 'Default';
 
   @override
@@ -56,17 +57,14 @@ class _HomeState extends State<Home> {
     });
   }
 
-  Future getProjectList() async {
-    debugPrint("Home - In getProjectList");
-    // List prMapList = await prDAO.getAll(prDAO.pkColumn);
-    // List<Project> prModels = prMapList.map((e) => Project.convertToProject(e)).toList();
-    // projectList = prModels.map((e) => e.name).toList();
-    // debugPrint(projectList.toString());
+  Future<List> getProjectList() async {
+    var p = Projects();
+    var projectList = await p.getProjectList();
     return projectList;
   }
 
   Future getTSData() async {
-    debugPrint("In getTSData()");
+    debugPrint("Home:getTSData()");
     // var tsPrDBRows = await tsDAO.getTimeSheetAndProjectName();
     // var tsPrModels = tsPrDBRows.map((e) => TimeSheet.convertToProjectTimeSheet(e)).toList();
     // debugPrint('From Database: ${tsPrDBRows.toString()}');
@@ -84,7 +82,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget getTSChart(String projectName) {
-    debugPrint("ProjectName: $projectName");
+    debugPrint("Home:getTSChart ProjectName: $projectName");
     // //var currentChVM = _myData.where((element) => element.projectName == projectName).first;
     // final List<Charts.Series<ChartViewModel, DateTime>> seriesList = [
     //   Charts.Series<ChartViewModel, DateTime>(

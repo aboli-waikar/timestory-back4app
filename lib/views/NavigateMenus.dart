@@ -165,21 +165,32 @@
 
 
 
-print("po: $po");
-var id = po.get('objectId');
-print(id);
-
-QueryBuilder<ParseObject> parseQuery = QueryBuilder(ParseObject('User'));
-parseQuery.whereContains('objectId', id);
-
-var apiResponse = await parseQuery.query();
-
-{"className":"Project","name":"P2","company":"W","hourlyRate":100,"currency":"","userId":"WES1YmOLae","projectId":2}
-
-
-[{"className":"Project","objectId":"hFIxIuqd6p","createdAt":"2022-03-29T15:31:57.671Z","updatedAt":"2022-03-30T16:42:44.501Z","userId":{"__type":"Pointer","className":"_User","objectId":
-"WES1YmOLae"},"projectId":1,"name":"Microgrid","company":"Codionics","hourlyRate":1400,"currency":"INR"}]
-
-
-{"className":"Project","userId":{"__type":"Pointer","className":"User","objectId":"WES1YmOLae"},"projectId":2,"name":"P2","company":"C2","hourlyRate":100,"currency":"INR"}
-
+// print("po: $po");
+// var id = po.get('objectId');
+// print(id);
+//
+// QueryBuilder<ParseObject> parseQuery = QueryBuilder(ParseObject('User'));
+// parseQuery.whereContains('objectId', id);
+//
+// var apiResponse = await parseQuery.query();
+//
+// {"className":"Project","name":"P2","company":"W","hourlyRate":100,"currency":"","userId":"WES1YmOLae","projectId":2}
+//
+//
+// [{"className":"Project","objectId":"hFIxIuqd6p","createdAt":"2022-03-29T15:31:57.671Z","updatedAt":"2022-03-30T16:42:44.501Z","userId":{"__type":"Pointer","className":"_User","objectId":
+// "WES1YmOLae"},"projectId":1,"name":"Microgrid","company":"Codionics","hourlyRate":1400,"currency":"INR"}]
+//
+//
+// {"className":"Project","userId":{"__type":"Pointer","className":"User","objectId":"WES1YmOLae"},"projectId":2,"name":"P2","company":"C2","hourlyRate":100,"currency":"INR"}
+//
+//debugPrint("Add Project ApiResponse: ${apiResponse.results.toString()}");
+//return apiResponse;
+//if(apiResponse.success && apiResponse.results != null){
+// if (apiResponse.success) {
+//   var message = "Project successfully created.";
+//   util.showMessage(context, message);
+//   return apiResponse.results;
+// } else {
+//   var message = apiResponse.error!.message;
+//   util.showMessage(context, message);
+// }
