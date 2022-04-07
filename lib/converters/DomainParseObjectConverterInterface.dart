@@ -7,6 +7,8 @@ abstract class DomainParseObjectConverterInterface<T> {
 
   ParseObject domainToNewParseObject(T t);
   T parseObjectToDomain(ParseObject po);
+
+  /// parseObjectToDomainWithOnlyId returns DomainModel and written to be used by the model referring to the DomainModel objectId
   T parseObjectToDomainWithOnlyId(ParseObject po);
   Map domainToPointerParseObject(T t);
   //void domainToUpdateParseObject(ParseObject po, T t);

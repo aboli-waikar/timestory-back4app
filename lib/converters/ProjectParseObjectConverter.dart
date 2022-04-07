@@ -12,11 +12,11 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
   @override
   final String _className = "_Project";
 
-  UserParseObjectConverter uPoConv = UserParseObjectConverter();
+  UserParseObjectConverter uToPoConv = UserParseObjectConverter();
 
   _setPOProperties(ParseObject po, ProjectDataModel t) {
 
-    var userMap = uPoConv.domainToPointerParseObject(t.userDM);
+    var userMap = uToPoConv.domainToPointerParseObject(t.userDM);
 
     po.set('userId', userMap);
     po.set('projectId', t.projectId);
@@ -68,7 +68,7 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
     var currency = po.get<String>('currency');
     var projectId = po.get<num>('projectId');
     ParseUser? parseUser = po.get<ParseUser>('userId');
-    UserDataModel udm = uPoConv.parseObjectToDomainWithOnlyId(parseUser!); // UserDataModel with only Object Id
+    UserDataModel udm = uToPoConv.parseObjectToDomainWithOnlyId(parseUser!); // UserDataModel with only Object Id
     var project = ProjectDataModel(objectId, udm, projectId!, name!, company!, hourlyRate!, currency!);
     print("ProjectParseObjectConverter project: ${project.toString()}");
     return project;
@@ -78,7 +78,7 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
   ProjectDataModel parseObjectToDomainWithOnlyId(ParseObject po) {
     var objectId = po.get<String>('objectId');
     ParseUser? userId = po.get<ParseUser>('userId');
-    UserDataModel udm = uPoConv.parseObjectToDomain(userId!);
+    UserDataModel udm = uToPoConv.parseObjectToDomain(userId!);
     var project = ProjectDataModel.onlyObjectIdUserId(objectId!, udm);
     return project;
   }

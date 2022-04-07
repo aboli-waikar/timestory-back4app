@@ -216,7 +216,7 @@ showProjectDialog(BuildContext context, ProjectDataModel pdm, maxProjectId) {
                             (pdm.objectId == "") ? projRepo.create(pdmChange) : projRepo.update(pdmChange);
 
                             Navigator.pop(context);
-                            Navigator.pushNamed(context, Projects.routeName);
+                            // Navigator.pushNamed(context, Projects.routeName);
                             // Navigator.pushAndRemoveUntil(
                             //     context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 3)), (route) => false);
                           }
