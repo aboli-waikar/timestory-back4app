@@ -83,7 +83,7 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
             child: isBusy
                 ? const CircularProgressIndicator()
                 : isLoggedIn
-                    ? const NavigateMenuTopBar() //NavigateMenus()
+                    ? NavigateMenuTopBar(index: 0) //NavigateMenus()
                     : const Login(),
           ),
         ),

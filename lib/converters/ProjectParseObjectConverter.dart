@@ -35,6 +35,31 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
   }
 
   @override
+  domainToUpdateParseObject(ProjectDataModel t) {
+
+    ParseObject project = ParseObject(_tableName)
+      ..objectId = t.objectId;
+    _setPOProperties(project, t);
+
+    print("ProjectParseObjectConverter Update Project: ${project.toString()}");
+    return project;
+
+
+  }
+
+  @override
+  domainToDeleteParseObject(ProjectDataModel t) {
+
+    ParseObject project = ParseObject(_tableName)
+      ..objectId = t.objectId;
+
+    print("ProjectParseObjectConverter Delete Project: ${project.toString()}");
+    return project;
+
+
+  }
+
+  @override
   parseObjectToDomain(ParseObject po) {
     var objectId = po.get<String>('objectId');
     var name = po.get<String>('name');
@@ -42,25 +67,20 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
     var hourlyRate = po.get<num>('hourlyRate');
     var currency = po.get<String>('currency');
     var projectId = po.get<num>('projectId');
-    ParseUser? user = po.get<ParseUser>('userId');
-    UserDataModel udm = uPoConv.parseReference(user!); // UserDataModel with only Object Id
+    ParseUser? parseUser = po.get<ParseUser>('userId');
+    UserDataModel udm = uPoConv.parseObjectToDomainWithOnlyId(parseUser!); // UserDataModel with only Object Id
     var project = ProjectDataModel(objectId, udm, projectId!, name!, company!, hourlyRate!, currency!);
     print("ProjectParseObjectConverter project: ${project.toString()}");
     return project;
   }
 
   @override
-  ProjectDataModel parseReference(ParseObject po) {
+  ProjectDataModel parseObjectToDomainWithOnlyId(ParseObject po) {
     var objectId = po.get<String>('objectId');
     ParseUser? userId = po.get<ParseUser>('userId');
     UserDataModel udm = uPoConv.parseObjectToDomain(userId!);
-    var project = ProjectDataModel.fromId(objectId!, udm);
+    var project = ProjectDataModel.onlyObjectIdUserId(objectId!, udm);
     return project;
-  }
-
-  @override
-  void updateParseObject(ParseObject po, ProjectDataModel t) {
-    _setPOProperties(po, t);
   }
 
   @override

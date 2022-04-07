@@ -29,9 +29,9 @@ class UserParseObjectConverter implements DomainParseObjectConverterInterface<Us
   }
 
   @override
-  UserDataModel parseReference(ParseObject po) {
+  UserDataModel parseObjectToDomainWithOnlyId(ParseObject po) {
     var id = po.get<String>('objectId');
-    var user = UserDataModel.fromId(id!);
+    var user = UserDataModel.onlyId(id!);
     return user;
   }
 
@@ -41,10 +41,10 @@ class UserParseObjectConverter implements DomainParseObjectConverterInterface<Us
     return userMap;
   }
 
-  @override
-  void updateParseObject(ParseObject po, t) {
-    _setPOProperties(po, t);
-  }
+  // @override
+  // void domainToUpdateParseObject(ParseObject po, t) {
+  //   _setPOProperties(po, t);
+  // }
 
   _setPOProperties(ParseObject po, UserDataModel t) {
     po.set('username', t.username);

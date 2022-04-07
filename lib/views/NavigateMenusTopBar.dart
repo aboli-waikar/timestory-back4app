@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
 import 'package:timestory_back4app/views/Home.dart';
-import 'package:timestory_back4app/views/Profile.dart';
+import 'package:timestory_back4app/views/Projects.dart';
 import 'package:timestory_back4app/views/ReadTimeSheet.dart';
 
 import 'QuickAdd.dart';
 
 class NavigateMenuTopBar extends StatefulWidget {
-  const NavigateMenuTopBar({Key? key}) : super(key: key);
+  final index;
+  const NavigateMenuTopBar({Key? key, this.index}) : super(key: key);
 
   @override
   State<NavigateMenuTopBar> createState() => _NavigateMenuTopBarState();
@@ -20,7 +21,7 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
     Home(),
     ReadTimeSheet(),
     Expenses(),
-    Profile(),
+    Projects(),
     QuickAdd(),
   ];
 
@@ -46,7 +47,7 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
               NavigationDestination(icon: Icon(Icons.home, color: Colors.brown, size: 50), label: 'Home' ),
               NavigationDestination(icon: Icon(Icons.update, color: Colors.brown, size: 50), label: 'TimeSheet'),
               NavigationDestination(icon: Icon(Icons.money_outlined, color: Colors.brown, size: 50), label: 'Expenses'),
-              NavigationDestination(icon: Icon(Icons.person, color: Colors.brown, size: 50), label: 'Profile'),
+              NavigationDestination(icon: Icon(Icons.home_work, color: Colors.brown, size: 50), label: 'Projects'),
               NavigationDestination(icon: Icon(Icons.add_circle, color: Colors.brown, size: 50), label: 'Quick Add ')
             ],
       ),

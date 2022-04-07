@@ -14,9 +14,7 @@ class ProjectDataModel extends Domain {
 
   ProjectDataModel(this.objectId, this.userDM, this.projectId, this.name, this.company, this.hourlyRate, this.currency);
 
-  ProjectDataModel.fromId(String objectId, UserDataModel userId) : this(objectId, userId, 0, "", "", 0, "");
-
-  ProjectDataModel.withObjectIdUserId(String objectId, UserDataModel userId) : this(objectId, userId, 0, "", "", 0, "");
+  ProjectDataModel.onlyObjectIdUserId(String objectId, UserDataModel userId) : this(objectId, userId, 0, "", "", 0, "");
 
   static final ProjectDataModel nullObject = ProjectDataModel("", UserDataModel.nullObject, 0, "", "", 0, "");
 

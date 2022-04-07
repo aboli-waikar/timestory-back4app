@@ -35,7 +35,7 @@ class Utilities {
       {
         _success = true;
         showMessage(context, "Registration successful");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar()), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) => false);
       }
     } else {
       _success = false;
@@ -50,7 +50,7 @@ class Utilities {
       {
         _success = true;
         showMessage(context, "Login successful");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar()), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) => false);
       }
     } else {
       _success = false;
@@ -92,7 +92,7 @@ class Utilities {
         updateGoogleUser(googleAuthData);
         _success = true;
         showMessage(context, "Login successful");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar()), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) => false);
       }
     } else {
       _success = false;

@@ -34,7 +34,6 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     getTSData();
-    getProjectList();
   }
 
   getMonth(DateTime dT) {
@@ -55,12 +54,6 @@ class _HomeState extends State<Home> {
       selectedMonth = d!;
       getTSData();
     });
-  }
-
-  Future<List> getProjectList() async {
-    var p = Projects();
-    var projectList = await p.getProjectList();
-    return projectList;
   }
 
   Future getTSData() async {

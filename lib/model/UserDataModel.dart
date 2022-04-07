@@ -9,7 +9,7 @@ class UserDataModel extends Domain {
   final String? password;
   final String photoUrl;
 
-  UserDataModel.fromId(String objectId): this(objectId, "", "", "", "");
+  UserDataModel.onlyId(String objectId): this(objectId, "", "", "", "");
 
   UserDataModel(this.objectId, this.username, this.password, this.email, this.photoUrl);
 
