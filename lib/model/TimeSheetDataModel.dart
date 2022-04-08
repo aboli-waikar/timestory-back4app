@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:timestory_back4app/model/Domain.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 
@@ -6,11 +7,11 @@ class TimeSheetDataModel extends Domain{
 
   @override
   final String? objectId;
-  final ProjectDataModel projectDM;
-  final DateTime selectedDate;
-  final TimeOfDay startTime;
-  final TimeOfDay endTime;
-  final String workDescription;
+  late final ProjectDataModel projectDM;
+  late final DateTime selectedDate;
+  late final TimeOfDay startTime;
+  late final TimeOfDay endTime;
+  late final String workDescription;
   final num numberOfHrs;
 
   TimeSheetDataModel(this.objectId, this.projectDM, this.selectedDate, this.startTime, this.endTime, this.workDescription, this.numberOfHrs);
@@ -19,6 +20,18 @@ class TimeSheetDataModel extends Domain{
 
   TimeSheetDataModel.onlyObjectIdProjectId(String objectId, ProjectDataModel projectDM): this(objectId, projectDM, DateTime.now(), TimeOfDay.now(),
       TimeOfDay.now(), "",0.0); //constructor overloading
+
+  String get selectedDateStr {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    var toFormat = (this.selectedDate == null) ? DateTime.now() : this.selectedDate;
+    return formatter.format(toFormat);
+  }
+
+  String timeOfDayToString(TimeOfDay tod) {
+    final now = new DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    return DateFormat.jm().format(dt);
+  }
 
   @override
   toString(){

@@ -21,7 +21,6 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
     po.set('numberOfHrs', t.numberOfHrs);
   }
 
-
   @override
   ParseObject domainToNewParseObject(TimeSheetDataModel t) {
     var timeSheet = ParseObject(_tableName);
@@ -30,8 +29,23 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
   }
 
   @override
+  ParseObject domainToUpdateParseObject(TimeSheetDataModel t) {
+    var timeSheet = ParseObject(_tableName)..objectId = t.objectId;
+    _setPoProperties(timeSheet, t);
+    return timeSheet;
+  }
+
+  @override
+  ParseObject domainToDeleteParseObject(t) {
+    var timeSheet = ParseObject(_className)..objectId = t.objectId;
+
+    print("TimeSheetParseObjectConverter Delete TimeSheet: ${timeSheet.toString()}");
+    return timeSheet;
+  }
+
+  @override
   Map domainToPointerParseObject(TimeSheetDataModel t) {
-    Map timeSheetMap = {"__type":"Pointer","className":_className,"objectId":t.objectId};
+    Map timeSheetMap = {"__type": "Pointer", "className": _className, "objectId": t.objectId};
     return timeSheetMap;
   }
 
@@ -40,7 +54,7 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
     var objectId = po.get<String>('objectId');
 
     var projectPo = po.get<ParseObject>('projectId');
-    ProjectDataModel pdm = pToPoConv.parseObjectToDomainWithOnlyId(projectPo!);
+    ProjectDataModel pdm = pToPoConv.parseObjectToDomainIncludeOnlyObjectId(projectPo!);
 
     var selectedDate = po.get<DateTime>('selectedDate');
     var startTime = po.get<TimeOfDay>('startTime');
@@ -52,12 +66,11 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
 
   ///parseObjectToDomainWithOnlyId returns TimeSheetDataModel and written to be used by the model referring to TimeSheet objectId
   @override
-  TimeSheetDataModel parseObjectToDomainWithOnlyId(ParseObject po) {
+  TimeSheetDataModel parseObjectToDomainIncludeOnlyObjectId(ParseObject po) {
     var objectId = po.get('objectId');
     var projectId = po.get('projectId');
-    ProjectDataModel pdm = pToPoConv.parseObjectToDomainWithOnlyId(projectId);
+    ProjectDataModel pdm = pToPoConv.parseObjectToDomainIncludeOnlyObjectId(projectId);
     var timeSheet = TimeSheetDataModel.onlyObjectIdProjectId(objectId, pdm);
     return timeSheet;
   }
-
 }

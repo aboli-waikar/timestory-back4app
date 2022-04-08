@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
@@ -9,7 +10,6 @@ import 'package:timestory_back4app/converters/UserParseObjectConverter.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/repositories/ProjectRepository.dart';
 import 'package:timestory_back4app/util/Utilities.dart';
-import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
 import 'package:timestory_back4app/views/Profile.dart';
 
 class Projects extends StatefulWidget {

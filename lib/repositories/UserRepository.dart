@@ -32,4 +32,14 @@ class UserRepository extends Repository<UserDataModel> {
   void create(UserDataModel t) {
     // TODO: implement create
   }
+
+  @override
+  void update(UserDataModel t) {
+    // TODO: implement update
+  }
+
+  @override
+  void delete(UserDataModel t) {
+    // TODO: implement delete
+  }
 }

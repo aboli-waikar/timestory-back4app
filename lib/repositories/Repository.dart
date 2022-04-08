@@ -9,4 +9,7 @@ abstract class Repository<T extends Domain> {
   Future<List<T>> getAll();
   Future<T> getById(String objectId);
   void create(T t);
+  void update(T t);
+  void delete(T t);
+
 }

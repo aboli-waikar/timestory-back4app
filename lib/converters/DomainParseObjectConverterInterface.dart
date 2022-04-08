@@ -6,12 +6,10 @@ abstract class DomainParseObjectConverterInterface<T> {
   abstract String _className;
 
   ParseObject domainToNewParseObject(T t);
+  ParseObject domainToUpdateParseObject(T t);
+  ParseObject domainToDeleteParseObject(T t);
   T parseObjectToDomain(ParseObject po);
-
   /// parseObjectToDomainWithOnlyId returns DomainModel and written to be used by the model referring to the DomainModel objectId
-  T parseObjectToDomainWithOnlyId(ParseObject po);
+  T parseObjectToDomainIncludeOnlyObjectId(ParseObject po);
   Map domainToPointerParseObject(T t);
-  //void domainToUpdateParseObject(ParseObject po, T t);
-  //void domainToUpdateParseObject(T t);
-
 }
