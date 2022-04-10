@@ -12,20 +12,31 @@ class ProjectRepository extends Repository<ProjectDataModel> {
   @override
   Future<List<ProjectDataModel>> getAll() async {
     final apiResponse = await ParseObject(_tableName).getAll();
-    print("UserRepository:getAll ApiResponse: ${apiResponse.results.toString()}");
+    //print("ProjectRepository:getAll ApiResponse: ${apiResponse.results.toString()}");
     if (apiResponse.success && apiResponse.results != null) {
-      var pns = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => pToPoConv.parseObjectToDomain(po)).toList();
-      print("UserRepository:getAll pns: ${pns.toString()}");
-      print("UserRepository:getAll usersLength: ${pns.length.toString()}");
-      return pns.toList();
+      List<ProjectDataModel> pdm = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => pToPoConv.parseObjectToDomain(po)).toList();
+      print("ProjectRepository:getAll pdm: ${pdm.toString()}");
+      print("ProjectRepository:getAll pdmLength: ${pdm.length.toString()}");
+      return pdm.toList();
     }
     return [];
   }
 
   @override
-  Future<ProjectDataModel> getById(String objectId) {
-    // TODO: implement getById
-    throw UnimplementedError();
+ Future<ProjectDataModel> getById(String? objectId) async {
+
+    var apiResponse = await ParseObject(_tableName).getObject(objectId!);
+
+    if (apiResponse.success && apiResponse.results != null) {
+      var pdm;
+      for (var o in apiResponse.results!) {
+        final po = o as ParseObject;
+        pdm = pToPoConv.parseObjectToDomain(po);
+      }
+      return pdm;
+    }
+
+    return ProjectDataModel.nullObject;
   }
 
   @override

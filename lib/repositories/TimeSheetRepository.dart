@@ -5,7 +5,11 @@ import 'package:timestory_back4app/repositories/Repository.dart';
 
 class TimeSheetRepository extends Repository<TimeSheetDataModel> {
 
+  @override
+  final String _tableName = "TimeSheet";
+
   var tsToPoConv = TimeSheetParseObjectConverter();
+  //var tsModel = TimeSheetDataModel(objectId, projectDM, selectedDate, startTime, endTime, workDescription, numberOfHrs)
 
   @override
   void create(TimeSheetDataModel t) async {
@@ -34,9 +38,16 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
   }
 
   @override
-  Future<List<TimeSheetDataModel>> getAll() {
-    // TODO: implement getAll
-    throw UnimplementedError();
+  Future<List<TimeSheetDataModel>> getAll() async {
+    final apiResponse = await ParseObject(_tableName).getAll();
+    //print("TimeSheetRepository:getAll ApiResponse: ${apiResponse.results.toString()}");
+    if (apiResponse.success && apiResponse.results != null) {
+      var ts = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => tsToPoConv.parseObjectToDomain(po)).toList();
+      print("TimeSheetRepository:getAll ts: ${ts.toString()}");
+      print("TimeSheetRepository:getAll tsLength: ${ts.length.toString()}");
+      return ts.toList();
+    }
+    return [];
   }
 
   @override

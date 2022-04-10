@@ -11,11 +11,12 @@ import '../model/TimeSheetDataModel.dart';
 class InsertUpdateTimeSheet extends StatefulWidget {
   final TimeSheetDataModel tsModel;
 
+  InsertUpdateTimeSheet(this.tsModel, {Key? key}) : super(key: key);
+
   InsertUpdateTimeSheet.defaultModel({Key? key})
       : tsModel = TimeSheetDataModel.nullObjects,
         super(key: key);
 
-  const InsertUpdateTimeSheet(this.tsModel, {Key? key}) : super(key: key);
 
   @override
   InsertUpdateTimeSheetState createState() => InsertUpdateTimeSheetState();
@@ -94,6 +95,15 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
       });
     }
   }
+  _setNumberOfHrs(TimeOfDay startTime, TimeOfDay endTime) {
+    int smin = startTime.hour * 60 + startTime.minute;
+    int emin = endTime.hour * 60 + endTime.minute;
+    var diffmin = (emin - smin) / 60;
+    var _numberOfhrs = diffmin.toInt() + ((emin - smin) % 60) / 100;
+    debugPrint('InsertUpdateTimeSheet:_setNumberOfHrs numberofHrs: $_numberOfhrs');
+    return _numberOfhrs;
+  }
+
 
   deleteButton() {
     var delete = ElevatedButton(
@@ -187,12 +197,12 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                 children: [
                   ElevatedButton(
                       onPressed: () {
+                        widget.tsModel.numberOfHrs = _setNumberOfHrs(widget.tsModel.startTime, widget.tsModel.endTime);
+                        widget.tsModel.workDescription = workDescriptionTextEditingController.text;
+                        widget.tsModel.projectDM = (pdvmList.firstWhere((element) => element.projectIdName == projectSelected)).pdm;
 
-                        ProjectDataViewModel x = pdvmList.firstWhere((element) => element.projectIdName == projectSelected);
-                        var tsModel = TimeSheetDataModel(widget.tsModel.objectId, x.pdm, widget.tsModel.selectedDate, widget.tsModel.startTime, widget.tsModel.endTime, workDescriptionTextEditingController.text,
-                            widget.tsModel.numberOfHrs);
-                        debugPrint("InsertUpdateTimeSheet:build tsModel= $tsModel");
-                        //tsRepo.create(widget.tsModel);
+                        debugPrint("InsertUpdateTimeSheet:build tsModel= ${widget.tsModel}");
+                        tsRepo.create(widget.tsModel);
                         Navigator.pop(context);
                         //Use PushReplacementNamed method to go back to the root page without back arrow in Appbar.
                         //Navigator.pushReplacementNamed(context, '/');

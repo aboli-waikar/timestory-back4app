@@ -3,11 +3,11 @@ import 'package:timestory_back4app/model/Domain.dart';
 class UserDataModel extends Domain {
 
   @override
-  final String? objectId;
-  final String username;
-  final String email;
-  final String? password;
-  final String photoUrl;
+  String? objectId;
+  String username;
+  String email;
+  String? password;
+  String photoUrl;
 
   UserDataModel.onlyId(String objectId): this(objectId, "", "", "", "");
 

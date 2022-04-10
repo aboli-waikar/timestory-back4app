@@ -43,8 +43,8 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
   }
 
   Future<void> initAction() async {
-    final timeStoryUser = await ParseUser.currentUser();
-    debugPrint('TimeStoryUser from Main: $timeStoryUser');
+    final timeStoryUser = await ParseUser.currentUser() as ParseUser;
+    debugPrint('TimeStoryUser from Main: ${timeStoryUser.username}');
 
     // final String? storedUIDToken = await secureStorage.read(key: 'uid');
     // debugPrint('From main storedUIDToken: $storedUIDToken');

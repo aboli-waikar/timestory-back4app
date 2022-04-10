@@ -7,7 +7,7 @@ import '../model/UserDataModel.dart';
 
 class ProjectParseObjectConverter implements DomainParseObjectConverterInterface<ProjectDataModel> {
   final String _tableName = "Project";
-  final String _className = "_Project";
+  final String _className = "Project";
 
   UserParseObjectConverter uToPoConv = UserParseObjectConverter();
 
@@ -65,9 +65,10 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
   @override
   ProjectDataModel parseObjectToDomainIncludeOnlyObjectId(ParseObject po) {
     var objectId = po.get<String>('objectId');
-    ParseUser? userId = po.get<ParseUser>('userId');
-    UserDataModel udm = uToPoConv.parseObjectToDomain(userId!);
-    var project = ProjectDataModel.onlyObjectIdUserId(objectId!, udm);
+    // ParseUser? userId = po.get<ParseUser>('userId');
+    // UserDataModel udm = uToPoConv.parseObjectToDomain(userId!);
+    // var project = ProjectDataModel.onlyObjectIdUserId(objectId!, udm);
+    var project = ProjectDataModel.onlyId(objectId!);
     return project;
   }
 

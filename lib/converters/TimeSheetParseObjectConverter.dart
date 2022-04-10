@@ -12,11 +12,14 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
   var pToPoConv = ProjectParseObjectConverter();
 
   void _setPoProperties(ParseObject po, TimeSheetDataModel t) {
+
+    var startTimeStr = t.timeOfDayToString(t.startTime);
+    var endTimeStr = t.timeOfDayToString(t.endTime);
     var projectMap = pToPoConv.domainToPointerParseObject(t.projectDM);
     po.set('projectId', projectMap);
     po.set('selectedDate', t.selectedDate);
-    po.set('startTime', t.startTime);
-    po.set('endTime', t.endTime);
+    po.set('startTime', startTimeStr);
+    po.set('endTime', endTimeStr);
     po.set('workDescription', t.workDescription);
     po.set('numberOfHrs', t.numberOfHrs);
   }
@@ -57,11 +60,16 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
     ProjectDataModel pdm = pToPoConv.parseObjectToDomainIncludeOnlyObjectId(projectPo!);
 
     var selectedDate = po.get<DateTime>('selectedDate');
-    var startTime = po.get<TimeOfDay>('startTime');
-    var endTime = po.get<TimeOfDay>('endTime');
+
+    var ST = po.get<String>('startTime');
+    var startTime = stringToTimeOfDay(ST!);
+    var ET = po.get<String>('endTime');
+    var endTime = stringToTimeOfDay(ET!);
+
     var workDescription = po.get<String>('workDescription');
     var numberOfHrs = po.get<num>('numberOfHrs');
-    return TimeSheetDataModel(objectId, pdm, selectedDate!, startTime!, endTime!, workDescription!, numberOfHrs!);
+
+    return TimeSheetDataModel(objectId, pdm, selectedDate!, startTime, endTime, workDescription!, numberOfHrs!);
   }
 
   ///parseObjectToDomainWithOnlyId returns TimeSheetDataModel and written to be used by the model referring to TimeSheet objectId

@@ -6,13 +6,13 @@ import 'package:timestory_back4app/model/ProjectDataModel.dart';
 class TimeSheetDataModel extends Domain{
 
   @override
-  final String? objectId;
-  late final ProjectDataModel projectDM;
-  late final DateTime selectedDate;
-  late final TimeOfDay startTime;
-  late final TimeOfDay endTime;
-  late final String workDescription;
-  final num numberOfHrs;
+  String? objectId;
+  ProjectDataModel projectDM;
+  DateTime selectedDate;
+  TimeOfDay startTime;
+  TimeOfDay endTime;
+  String workDescription;
+  num numberOfHrs;
 
   TimeSheetDataModel(this.objectId, this.projectDM, this.selectedDate, this.startTime, this.endTime, this.workDescription, this.numberOfHrs);
 
@@ -38,6 +38,9 @@ class TimeSheetDataModel extends Domain{
     return "TimeSheetDataModel($objectId, $projectDM, $selectedDate, $startTime, $endTime, $workDescription, $numberOfHrs)";
   }
 
+}
 
-
+TimeOfDay stringToTimeOfDay(String ts) {
+  final format = DateFormat.jm(); //"6:00 AM"
+  return TimeOfDay.fromDateTime(format.parse(ts));
 }

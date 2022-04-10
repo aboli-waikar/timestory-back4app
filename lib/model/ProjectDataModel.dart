@@ -3,18 +3,21 @@ import 'package:timestory_back4app/model/UserDataModel.dart';
 
 class ProjectDataModel extends Domain {
   @override
-  final String? objectId;
-  final UserDataModel userDM;
-  final num projectId;
-  final String name;
-  final String company;
-  final num hourlyRate;
-  final String currency;
+  String? objectId;
+  UserDataModel userDM;
+  num projectId;
+  String name;
+  String company;
+  num hourlyRate;
+  String currency;
 
 
   ProjectDataModel(this.objectId, this.userDM, this.projectId, this.name, this.company, this.hourlyRate, this.currency);
 
-  ProjectDataModel.onlyObjectIdUserId(String objectId, UserDataModel userId) : this(objectId, userId, 0, "", "", 0, "");
+  ProjectDataModel.onlyId(String objectId) : this(objectId, UserDataModel.nullObject, 0, "", "", 0, "");
+
+  //ProjectDataModel.onlyObjectIdUserId(String objectId, UserDataModel userId) : this(objectId, userId, 0, "", "", 0, "");
+
 
   static final ProjectDataModel nullObject = ProjectDataModel("", UserDataModel.nullObject, 0, "", "", 0, "");
 
