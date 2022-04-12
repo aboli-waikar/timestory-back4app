@@ -1,15 +1,15 @@
 import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
 import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
 
-class DeleteTimeSheetViewModel {
+class TimeSheetViewModel {
   bool isDelete;
   TimeSheetDataModel tsModel;
   ProjectDataViewModel pdvModel;
 
-  DeleteTimeSheetViewModel(this.tsModel, this.pdvModel, this.isDelete);
+  TimeSheetViewModel(this.tsModel, this.pdvModel, this.isDelete);
   @override
   toString(){
-    return "DeleteTimeSheetViewModel($tsModel, $pdvModel, $isDelete)";
+    return "TimeSheetViewModel($tsModel, $pdvModel, $isDelete)";
   }
 
 }

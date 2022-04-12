@@ -15,7 +15,7 @@ class ProjectRepository extends Repository<ProjectDataModel> {
     //print("ProjectRepository:getAll ApiResponse: ${apiResponse.results.toString()}");
     if (apiResponse.success && apiResponse.results != null) {
       List<ProjectDataModel> pdm = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => pToPoConv.parseObjectToDomain(po)).toList();
-      print("ProjectRepository:getAll pdm: ${pdm.toString()}");
+      //print("ProjectRepository:getAll pdm: ${pdm.toString()}");
       print("ProjectRepository:getAll pdmLength: ${pdm.length.toString()}");
       return pdm.toList();
     }
@@ -71,7 +71,7 @@ class ProjectRepository extends Repository<ProjectDataModel> {
       print("ProjectRepository:Delete ppo: ${ppo.toString()}");
 
       var apiResponse = await ppo.delete();
-      print("ProjectRepository:Update apiResponse: ${apiResponse.toString()}");
+      print("ProjectRepository:Update apiResponse: ${apiResponse.results.toString()}");
     });
   }
 }

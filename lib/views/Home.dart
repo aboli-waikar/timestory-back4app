@@ -57,7 +57,7 @@ class _HomeState extends State<Home> {
   }
 
   Future getTSData() async {
-    debugPrint("Home:getTSData()");
+    //debugPrint("Home:getTSData()");
     // var tsPrDBRows = await tsDAO.getTimeSheetAndProjectName();
     // var tsPrModels = tsPrDBRows.map((e) => TimeSheet.convertToProjectTimeSheet(e)).toList();
     // debugPrint('From Database: ${tsPrDBRows.toString()}');
@@ -75,7 +75,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget getTSChart(String projectName) {
-    debugPrint("Home:getTSChart ProjectName: $projectName");
+    //debugPrint("Home:getTSChart ProjectName: $projectName");
     // //var currentChVM = _myData.where((element) => element.projectName == projectName).first;
     // final List<Charts.Series<ChartViewModel, DateTime>> seriesList = [
     //   Charts.Series<ChartViewModel, DateTime>(

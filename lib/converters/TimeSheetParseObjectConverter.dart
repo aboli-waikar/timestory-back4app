@@ -4,10 +4,11 @@ import 'package:timestory_back4app/converters/DomainParseObjectConverterInterfac
 import 'package:timestory_back4app/converters/ProjectParseObjectConverter.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
+import 'package:timestory_back4app/repositories/ProjectRepository.dart';
 
 class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterface<TimeSheetDataModel> {
   final String _tableName = 'TimeSheet';
-  final String _className = '_TimeSheet';
+  final String _className = 'TimeSheet';
 
   var pToPoConv = ProjectParseObjectConverter();
 
