@@ -41,7 +41,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     getTimeSheetList().then((value) {
       setState(() {
         tsModelList = value;
-        tsvmList = tsModelList.map((tsModel) => TimeSheetViewModel(tsModel, ProjectDataViewModel(tsModel.projectDM), false)).toList();
+        tsvmList = tsModelList.map((tsModel) => TimeSheetViewModel(tsModel, false)).toList();
       });
     });
   }
@@ -140,10 +140,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     );
   }
 
-  deleteTS() {
-    debugPrint("***ReadTimeSheet:deleteTS listDelTSViewModel: $tsvmList");
-    tsvmList.where((element) => element.isDelete == true).map((e) => tsRepo.delete(e.tsModel)).toList();
-  }
+
 
   AppBar getAppBar() {
     debugPrint("***ReadTimeSheet:getAppBar");
@@ -156,8 +153,17 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
       actions: [
         IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
-              deleteTS();
+            onPressed: () async {
+
+               // List<void> tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList()
+               //     .map((e) => tsRepo.delete(e)).toList();
+
+               var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
+
+               for(var tsModel in tsModelList) {
+                 await tsRepo.delete(tsModel);
+               }
+
               Navigator.pushReplacementNamed(context, '/');
             }),
         IconButton(icon: const Icon(Icons.select_all_rounded), onPressed: () => selectAll()),
@@ -220,56 +226,63 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     debugPrint("***ReadTimeSheet:Build");
     return Scaffold(
       appBar: getAppBar(),
-      body: FutureBuilder<List<TimeSheetViewModel>>(
-        future: getTSData(),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(
-              child: Text("Loading"),
-            );
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                    leading: Checkbox(
-                      value: snapshot.data[index].isDelete,
-                      onChanged: (bool? newValue) {
-                        setState(() {
-                          tsvmList[index].isDelete = newValue!;
-                          debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
+      body: StreamBuilder<Object>(
+        stream: null,
+        builder: (context, snapshot) {
+          return FutureBuilder<List<TimeSheetViewModel>>(
+            future: getTSData(),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.data == null) {
+                return const Center(
+                  child: Text("Loading"),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                        leading: Checkbox(
+                          value: snapshot.data[index].isDelete,
+                          onChanged: (bool? newValue) {
+                            setState(() {
+                              tsvmList[index].isDelete = newValue!;
+                              debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
+                            });
+                          },
+                        ),
+                        title: Column(children: [
+                          Row(
+                            children: [
+                              const Text("Project: ", style: TextStyle(fontSize: 13.0)),
+                              Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}", style: const
+                              TextStyle
+                                (fontSize: 15.0)),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text("Date: ", style: TextStyle(fontSize: 15.0)),
+                              Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
+                              Text(snapshot.data[index].tsModel.numberOfHrs.toString(),
+                                  style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold)),
+                            ],
+                          )
+                        ]),
+                        subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
                         });
-                      },
-                    ),
-                    title: Column(children: [
-                      Row(
-                        children: [
-                          const Text("Project: ", style: TextStyle(fontSize: 13.0)),
-                          Text(snapshot.data[index].pdvModel.projectIdName, style: const TextStyle(fontSize: 15.0)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Text("Date: ", style: TextStyle(fontSize: 15.0)),
-                          Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
-                          Text(snapshot.data[index].tsModel.numberOfHrs.toString(),
-                              style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold)),
-                        ],
-                      )
-                    ]),
-                    subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
-                    });
-              },
-            );
-          }
-        },
+                  },
+                );
+              }
+            },
+          );
+        }
       ),
       // floatingActionButton: FloatingActionButton(
       //     tooltip: 'Enter Timesheet',

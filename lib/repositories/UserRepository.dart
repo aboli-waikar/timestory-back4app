@@ -7,14 +7,14 @@ class UserRepository extends Repository<UserDataModel> {
   @override
   final String _tableName = "User";
 
-  var uPoConv = UserParseObjectConverter();
+  var uToPoConv = UserParseObjectConverter();
 
   @override
   Future<List<UserDataModel>> getAll() async {
     final apiResponse = await ParseObject(_tableName).getAll();
     print("UserRepository:getAll ApiResponse: ${apiResponse.results.toString()}");
     if (apiResponse.success && apiResponse.results != null) {
-      var users = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => uPoConv.parseObjectToDomain(po)).toList();
+      var users = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => uToPoConv.parseObjectToDomain(po)).toList();
       print("UserRepository:getAll users: ${users.toString()}");
       print("UserRepository:getAll usersLength: ${users.length.toString()}");
       return users.toList();
@@ -23,9 +23,19 @@ class UserRepository extends Repository<UserDataModel> {
   }
 
   @override
-  Future<UserDataModel> getById(String objectId) {
-    // TODO: implement getById
-    throw UnimplementedError();
+  Future<UserDataModel> getById(String objectId) async {
+    var apiResponse = await ParseObject(_tableName).getObject(objectId);
+
+    if (apiResponse.success && apiResponse.results != null) {
+      var udm;
+      for (var o in apiResponse.results!) {
+        final po = o as ParseObject;
+        udm = uToPoConv.parseObjectToDomain(po);
+      }
+      return udm;
+    }
+
+    return UserDataModel.nullObject;
   }
 
   @override

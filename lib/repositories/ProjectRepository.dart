@@ -3,6 +3,8 @@ import 'package:timestory_back4app/converters/ProjectParseObjectConverter.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/repositories/Repository.dart';
 
+import 'UserRepository.dart';
+
 class ProjectRepository extends Repository<ProjectDataModel> {
   @override
   final String _tableName = "Project";
@@ -22,9 +24,22 @@ class ProjectRepository extends Repository<ProjectDataModel> {
     return [];
   }
 
-  @override
- Future<ProjectDataModel> getById(String? objectId) async {
+  Future<List<ProjectDataModel>> getAllWithUserModel() async {
+    var userRepo = UserRepository();
+    List<ProjectDataModel> projectList = await getAll();
+    List<ProjectDataModel> tempProjList = [];
+    for (var t in projectList) {
+      tempProjList
+          .add(ProjectDataModel(t.objectId, await userRepo.getById(t.userDM.objectId!), t.projectId, t.name, t.company, t.hourlyRate, t.currency));
+    }
 
+    print("ProjectRepository:getAllWithUserModel ts: ${tempProjList.toString()}");
+    print("ProjectRepository:getAllWithUserModel tsLength: ${tempProjList.length.toString()}");
+    return tempProjList;
+  }
+
+  @override
+  Future<ProjectDataModel> getById(String? objectId) async {
     var apiResponse = await ParseObject(_tableName).getObject(objectId!);
 
     if (apiResponse.success && apiResponse.results != null) {
@@ -42,7 +57,6 @@ class ProjectRepository extends Repository<ProjectDataModel> {
   @override
   void create(ProjectDataModel t) async {
     await Future.delayed(Duration(seconds: 1), () async {
-
       print("ProjectRepository:Create Pdm: ${t.toString()}");
 
       var ppo = pToPoConv.domainToNewParseObject(t);

@@ -26,14 +26,16 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
   }
 
   @override
-  void delete(TimeSheetDataModel t) async {
-    await Future.delayed(Duration(seconds: 5), () async {
+  Future<ParseResponse> delete(TimeSheetDataModel t) async {
+    var apiResponse;
+    await Future.delayed(Duration(seconds: 1), () async {
       var tsPo = tsToPoConv.domainToDeleteParseObject(t);
       print("TimeSheetRepository:Delete tsPo: ${tsPo.toString()}");
 
-      var apiResponse = await tsPo.delete();
+      apiResponse = await tsPo.delete();
       print("TimeSheetRepository:Delete apiResponse: ${apiResponse.results.toString()}");
     });
+    return apiResponse;
   }
 
   @override

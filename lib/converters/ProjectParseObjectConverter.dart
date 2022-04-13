@@ -65,9 +65,6 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
   @override
   ProjectDataModel parseObjectToDomainIncludeOnlyObjectId(ParseObject po) {
     var objectId = po.get<String>('objectId');
-    // ParseUser? userId = po.get<ParseUser>('userId');
-    // UserDataModel udm = uToPoConv.parseObjectToDomain(userId!);
-    // var project = ProjectDataModel.onlyObjectIdUserId(objectId!, udm);
     var project = ProjectDataModel.onlyId(objectId!);
     return project;
   }
