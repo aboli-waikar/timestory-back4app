@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
+import 'package:timestory_back4app/util/Utilities.dart';
 import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
-import 'package:timestory_back4app/views/Projects.dart';
 
 import '../model/TimeSheetDataModel.dart';
 
@@ -16,7 +16,6 @@ class InsertUpdateTimeSheet extends StatefulWidget {
   InsertUpdateTimeSheet.defaultModel({Key? key})
       : tsModel = TimeSheetDataModel.nullObjects,
         super(key: key);
-
 
   @override
   InsertUpdateTimeSheetState createState() => InsertUpdateTimeSheetState();
@@ -95,15 +94,6 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
       });
     }
   }
-  _setNumberOfHrs(TimeOfDay startTime, TimeOfDay endTime) {
-    int smin = startTime.hour * 60 + startTime.minute;
-    int emin = endTime.hour * 60 + endTime.minute;
-    var diffmin = (emin - smin) / 60;
-    var _numberOfhrs = diffmin.toInt() + ((emin - smin) % 60) / 100;
-    debugPrint('InsertUpdateTimeSheet:_setNumberOfHrs numberofHrs: $_numberOfhrs');
-    return _numberOfhrs;
-  }
-
 
   deleteButton() {
     var delete = ElevatedButton(
@@ -127,7 +117,7 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
           decoration: const BoxDecoration(
               gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.red, Colors.orangeAccent])),
         ),
-        title: Text((isNewTimeSheet == false) ? "Enter Timesheet" : "Update Timesheet"),
+        title: Text(widget.tsModel.objectId == null ? "Enter Timesheet" : "Update Timesheet"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -166,7 +156,7 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                     tooltip: 'Pick a Start time',
                     onPressed: () => _selectStartTime(context)),
                 const Text('Start Time: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(widget.tsModel.timeOfDayToString(widget.tsModel.startTime)),
+                Text(timeOfDayToString(widget.tsModel.startTime)),
               ],
             ),
             Row(children: [
@@ -175,7 +165,7 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                   tooltip: 'Pick a Start time',
                   onPressed: () => _selectEndTime(context)),
               const Text('End Time: ', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(widget.tsModel.timeOfDayToString(widget.tsModel.endTime))
+              Text(timeOfDayToString(widget.tsModel.endTime))
             ]),
             Padding(
                 padding: const EdgeInsets.fromLTRB(12.0, 8, 0, 0),
@@ -197,20 +187,24 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                 children: [
                   ElevatedButton(
                       onPressed: () {
-                        widget.tsModel.numberOfHrs = _setNumberOfHrs(widget.tsModel.startTime, widget.tsModel.endTime);
+                        widget.tsModel.numberOfHrs = setNumberOfHrs(widget.tsModel.startTime, widget.tsModel.endTime);
                         widget.tsModel.workDescription = workDescriptionTextEditingController.text;
                         widget.tsModel.projectDM = (pdvmList.firstWhere((element) => element.projectIdName == projectSelected)).pdm;
 
                         debugPrint("InsertUpdateTimeSheet:build tsModel= ${widget.tsModel}");
-                        tsRepo.create(widget.tsModel);
+                        if (widget.tsModel.objectId == null) {
+                          tsRepo.create(widget.tsModel);
+                        } else {
+                          tsRepo.update(widget.tsModel);
+                        }
                         Navigator.pop(context);
                         //Use PushReplacementNamed method to go back to the root page without back arrow in Appbar.
-                        //Navigator.pushReplacementNamed(context, '/');
+                        Navigator.pushReplacementNamed(context, '/');
                       },
-                      child: Text(isNewTimeSheet ? 'Update' : 'Submit')),
+                      child: Text(widget.tsModel.objectId == null ? 'Submit' : 'Update')),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: isNewTimeSheet ? deleteButton() : null,
+                    child: widget.tsModel.objectId == null ? deleteButton() : null,
                   )
                 ],
               ),

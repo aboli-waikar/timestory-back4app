@@ -58,7 +58,7 @@ class ProjectParseObjectConverter implements DomainParseObjectConverterInterface
     ParseUser? parseUser = po.get<ParseUser>('userId');
     UserDataModel udm = uToPoConv.parseObjectToDomainIncludeOnlyObjectId(parseUser!); // UserDataModel with only Object Id
     var project = ProjectDataModel(objectId, udm, projectId!, name!, company!, hourlyRate!, currency!);
-    print("ProjectParseObjectConverter project: ${project.toString()}");
+    //print("ProjectParseObjectConverter project: ${project.toString()}");
     return project;
   }
 

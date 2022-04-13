@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:parse_server_sdk/parse_server_sdk.dart';
 import 'package:timestory_back4app/converters/DomainParseObjectConverterInterface.dart';
 import 'package:timestory_back4app/converters/ProjectParseObjectConverter.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
-import 'package:timestory_back4app/repositories/ProjectRepository.dart';
+import 'package:timestory_back4app/util/Utilities.dart';
 
 class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterface<TimeSheetDataModel> {
   final String _tableName = 'TimeSheet';
@@ -14,8 +13,8 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
 
   void _setPoProperties(ParseObject po, TimeSheetDataModel t) {
 
-    var startTimeStr = t.timeOfDayToString(t.startTime);
-    var endTimeStr = t.timeOfDayToString(t.endTime);
+    var startTimeStr = timeOfDayToString(t.startTime);
+    var endTimeStr = timeOfDayToString(t.endTime);
     var projectMap = pToPoConv.domainToPointerParseObject(t.projectDM);
     po.set('projectId', projectMap);
     po.set('selectedDate', t.selectedDate);
@@ -62,10 +61,10 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
 
     var selectedDate = po.get<DateTime>('selectedDate');
 
-    var ST = po.get<String>('startTime');
-    var startTime = stringToTimeOfDay(ST!);
-    var ET = po.get<String>('endTime');
-    var endTime = stringToTimeOfDay(ET!);
+    var sT = po.get<String>('startTime');
+    var startTime = stringToTimeOfDay(sT!);
+    var eT = po.get<String>('endTime');
+    var endTime = stringToTimeOfDay(eT!);
 
     var workDescription = po.get<String>('workDescription');
     var numberOfHrs = po.get<num>('numberOfHrs');

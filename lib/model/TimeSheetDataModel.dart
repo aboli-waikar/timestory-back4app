@@ -27,20 +27,9 @@ class TimeSheetDataModel extends Domain{
     return formatter.format(toFormat);
   }
 
-  String timeOfDayToString(TimeOfDay tod) {
-    final now = new DateTime.now();
-    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
-    return DateFormat.jm().format(dt);
-  }
-
   @override
   toString(){
     return "TimeSheetDataModel($objectId, $projectDM, $selectedDate, $startTime, $endTime, $workDescription, $numberOfHrs)";
   }
 
-}
-
-TimeOfDay stringToTimeOfDay(String ts) {
-  final format = DateFormat.jm(); //"6:00 AM"
-  return TimeOfDay.fromDateTime(format.parse(ts));
 }

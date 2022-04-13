@@ -18,11 +18,22 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
 
     await Future.delayed(Duration(seconds: 1), () async {
       var tsPo = tsToPoConv.domainToNewParseObject(t);
-      print("TimeSheetRepository:Create tsPo: ${tsPo.toString()}");
 
       var apiResponse = tsPo.save();
-      print("TimeSheetRepository:Create apiResponse: ${apiResponse.toString()}");
+      //print("TimeSheetRepository:Create apiResponse: ${apiResponse.toString()}");
     });
+  }
+
+  @override
+  void update(TimeSheetDataModel t) async {
+    print("TimeSheetRepository:Update t: ${t.toString()}");
+
+    await Future.delayed(Duration(seconds: 1), () {
+      var tsRepo = tsToPoConv.domainToUpdateParseObject(t);
+      var apiResponse = tsRepo.save();
+      //print("TimeSheetRepository:Update apiResponse: ${apiResponse.toString()}");
+    });
+
   }
 
   @override
@@ -30,21 +41,24 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
     var apiResponse;
     await Future.delayed(Duration(seconds: 1), () async {
       var tsPo = tsToPoConv.domainToDeleteParseObject(t);
-      print("TimeSheetRepository:Delete tsPo: ${tsPo.toString()}");
 
       apiResponse = await tsPo.delete();
-      print("TimeSheetRepository:Delete apiResponse: ${apiResponse.results.toString()}");
+      //print("TimeSheetRepository:Delete apiResponse: ${apiResponse.results.toString()}");
     });
     return apiResponse;
   }
 
   @override
   Future<List<TimeSheetDataModel>> getAll() async {
-    final apiResponse = await ParseObject(_tableName).getAll();
-    print("TimeSheetRepository:getAll ApiResponse: ${apiResponse.results.toString()}");
+    // final apiResponse = await ParseObject(_tableName).getAll();
+    
+    var parseQuery = QueryBuilder(ParseObject(_tableName));
+    parseQuery.orderByAscending('selectedDate');
+
+    final apiResponse = await parseQuery.query();
     if (apiResponse.success && apiResponse.results != null) {
       var ts = apiResponse.results!.map((e) => e as ParseObject).toList().map((po) => tsToPoConv.parseObjectToDomain(po)).toList();
-      print("TimeSheetRepository:getAll ts: ${ts.toString()}");
+      // print("TimeSheetRepository:getAll ts: ${ts.toString()}");
       print("TimeSheetRepository:getAll tsLength: ${ts.length.toString()}");
       return ts.toList();
     }
@@ -59,8 +73,7 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
       tempTSList.add(TimeSheetDataModel(
           t.objectId, (await projRepo.getById(t.projectDM.objectId)), t.selectedDate, t.startTime, t.endTime, t.workDescription, t.numberOfHrs));
     }
-
-    print("TimeSheetRepository:getAllWithProjectModel ts: ${tempTSList.toString()}");
+    // print("TimeSheetRepository:getAllWithProjectModel ts: ${tempTSList.toString()}");
     print("TimeSheetRepository:getAllWithProjectModel tsLength: ${tempTSList.length.toString()}");
     return tempTSList;
   }
@@ -71,8 +84,5 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
     throw UnimplementedError();
   }
 
-  @override
-  void update(TimeSheetDataModel t) {
-    // TODO: implement update
-  }
+
 }

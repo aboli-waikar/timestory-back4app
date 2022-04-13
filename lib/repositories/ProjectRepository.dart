@@ -33,8 +33,8 @@ class ProjectRepository extends Repository<ProjectDataModel> {
           .add(ProjectDataModel(t.objectId, await userRepo.getById(t.userDM.objectId!), t.projectId, t.name, t.company, t.hourlyRate, t.currency));
     }
 
-    print("ProjectRepository:getAllWithUserModel ts: ${tempProjList.toString()}");
-    print("ProjectRepository:getAllWithUserModel tsLength: ${tempProjList.length.toString()}");
+    // print("ProjectRepository:getAllWithUserModel ts: ${tempProjList.toString()}");
+    // print("ProjectRepository:getAllWithUserModel tsLength: ${tempProjList.length.toString()}");
     return tempProjList;
   }
 

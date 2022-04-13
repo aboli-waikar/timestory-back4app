@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:timestory_back4app/converters/TimeSheetParseObjectConverter.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
 import 'package:timestory_back4app/repositories/ProjectRepository.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
+import 'package:timestory_back4app/util/Utilities.dart';
 import 'package:timestory_back4app/viewModels/TimeSheetViewModel.dart';
 import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
 import 'InsertUpdateTimeSheet.dart';
@@ -85,18 +85,6 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     });
   }
 
-  getMonth(DateTime dT) {
-    final DateFormat formatter = DateFormat('yyyy-MM');
-    var yearMonth = formatter.format(dT);
-    return yearMonth;
-  }
-
-  getMonthStr(DateTime dT) {
-    final DateFormat formatter = DateFormat('MMM-yyyy');
-    var yearMonth = formatter.format(dT);
-    return yearMonth;
-  }
-
   Future<void> selectMonth(BuildContext context) async {
     final DateTime? d = await showMonthPicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2030));
     setState(() {
@@ -140,8 +128,6 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     );
   }
 
-
-
   AppBar getAppBar() {
     debugPrint("***ReadTimeSheet:getAppBar");
     var appBarWithDeleteIcon = AppBar(
@@ -154,15 +140,14 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
         IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () async {
+              // List<void> tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList()
+              //     .map((e) => tsRepo.delete(e)).toList();
 
-               // List<void> tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList()
-               //     .map((e) => tsRepo.delete(e)).toList();
+              var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
 
-               var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
-
-               for(var tsModel in tsModelList) {
-                 await tsRepo.delete(tsModel);
-               }
+              for (var tsModel in tsModelList) {
+                await tsRepo.delete(tsModel);
+              }
 
               Navigator.pushReplacementNamed(context, '/');
             }),
@@ -206,19 +191,11 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
   }
 
   Future<List<TimeSheetViewModel>> getTSData() async {
-    List<TimeSheetViewModel> tempList = [];
-    // if (selectedMonth == null) {
-    //   for (var t in tsModelList) {
-    //     tempList.add(TimeSheetViewModel(t, ProjectDataViewModel(await projRepo.getById(t.projectDM.objectId)), false));
-    //   }
-    // } else {
-    //   var tsmList = tsModelList.where((element) => getMonth(element.selectedDate) == getMonth(selectedMonth)).toList();
-    //   for (var t in tsmList) {
-    //     tempList.add(TimeSheetViewModel(t, ProjectDataViewModel(await projRepo.getById(t.projectDM.objectId)), false));
-    //   }
-    // }
-    //tsvmList = tempList;
-    return tsvmList; //= tempList;
+    if (selectedMonth == null) {
+      return tsvmList;
+    } else {
+      return tsvmList.where((element) => getMonth(element.tsModel.selectedDate) == getMonth(selectedMonth)).toList();
+    }
   }
 
   @override
@@ -226,76 +203,58 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     debugPrint("***ReadTimeSheet:Build");
     return Scaffold(
       appBar: getAppBar(),
-      body: StreamBuilder<Object>(
-        stream: null,
-        builder: (context, snapshot) {
-          return FutureBuilder<List<TimeSheetViewModel>>(
-            future: getTSData(),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.data == null) {
-                return const Center(
-                  child: Text("Loading"),
-                );
-              } else {
-                return ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                        leading: Checkbox(
-                          value: snapshot.data[index].isDelete,
-                          onChanged: (bool? newValue) {
-                            setState(() {
-                              tsvmList[index].isDelete = newValue!;
-                              debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
-                            });
-                          },
-                        ),
-                        title: Column(children: [
-                          Row(
-                            children: [
-                              const Text("Project: ", style: TextStyle(fontSize: 13.0)),
-                              Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}", style: const
-                              TextStyle
-                                (fontSize: 15.0)),
-                            ],
+      body: FutureBuilder<List<TimeSheetViewModel>>(
+              future: getTSData(),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.data == null) {
+                  return const Center(
+                    child: Text("Loading"),
+                  );
+                } else {
+                  return ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                          leading: Checkbox(
+                            value: snapshot.data[index].isDelete,
+                            onChanged: (bool? newValue) {
+                              setState(() {
+                                tsvmList[index].isDelete = newValue!;
+                                debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
+                              });
+                            },
                           ),
-                          Row(
-                            children: [
-                              const Text("Date: ", style: TextStyle(fontSize: 15.0)),
-                              Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
-                              Text(snapshot.data[index].tsModel.numberOfHrs.toString(),
-                                  style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold)),
-                            ],
-                          )
-                        ]),
-                        subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
-                        });
-                  },
-                );
-              }
-            },
-          );
-        }
-      ),
-      // floatingActionButton: FloatingActionButton(
-      //     tooltip: 'Enter Timesheet',
-      //     child: Icon(Icons.add),
-      //     onPressed: () {
-      //       Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet.defaultModel()));
-      //     }),
+                          title: Column(children: [
+                            Row(
+                              children: [
+                                const Text("Project: ", style: TextStyle(fontSize: 13.0)),
+                                Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
+                                    style: const TextStyle(fontSize: 15.0)),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text("Date: ", style: TextStyle(fontSize: 15.0)),
+                                Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
+                                Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
+                                    style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold))
+                              ],
+                            )
+                          ]),
+                          subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
+                            //Navigator.pushReplacementNamed(context, '/');
+                          });
+                    },
+                  );
+                }
+              },)
     );
   }
-}
-
-Future<List<TimeSheetDataModel>> getTimeSheetList() async {
-  var tsRepo = TimeSheetRepository();
-  List<TimeSheetDataModel> timeSheetList = await tsRepo.getAllWithProjectModel();
-  return timeSheetList;
 }

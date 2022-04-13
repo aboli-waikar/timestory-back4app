@@ -1,8 +1,15 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:timestory_back4app/model/ProjectDataModel.dart';
+import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
+import 'package:timestory_back4app/repositories/ProjectRepository.dart';
 import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
 import '../main.dart';
+import '../repositories/TimeSheetRepository.dart';
 
 class Utilities {
   var _success=false;
@@ -125,4 +132,68 @@ class Utilities {
     await timeStoryUser.save();
   }
 
+}
+
+getMonth(DateTime dT) {
+  final DateFormat formatter = DateFormat('yyyy-MM');
+  var yearMonth = formatter.format(dT);
+  return yearMonth;
+}
+
+getMonthStr(DateTime dT) {
+  final DateFormat formatter = DateFormat('MMM-yyyy');
+  var yearMonth = formatter.format(dT);
+  return yearMonth;
+}
+
+Future<List<TimeSheetDataModel>> getTimeSheetList() async {
+  var tsRepo = TimeSheetRepository();
+  List<TimeSheetDataModel> timeSheetList = await tsRepo.getAllWithProjectModel();
+  return timeSheetList;
+}
+
+Future<List<ProjectDataModel>> getProjectList() async {
+  var projRepo = ProjectRepository();
+  List<ProjectDataModel> projectList = await projRepo.getAll();
+  return projectList;
+}
+
+getMaxProjectId(List<ProjectDataModel> pdmList){
+  var projectIdList = pdmList.map((e) => e.projectId).toList();
+  var maxProjectId = projectIdList.reduce(max);
+  debugPrint("Projects:getProjectList maxProjectId: $maxProjectId");
+  return maxProjectId;
+}
+
+num getMins(num numberOfHrs) {
+  int intHrs = numberOfHrs.toInt();
+  num mins = numberOfHrs - intHrs;
+  num minutes = intHrs * 60 + mins * 100;
+  return minutes;
+}
+
+String getHrsMin(num min) {
+  var hrs = (min ~/ 60).toString();
+  String? minute = (min % 60).toInt().toString();
+  return (hrs + ' hrs ' + minute + ' min');
+}
+
+String timeOfDayToString(TimeOfDay tod) {
+  final now = new DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+  return DateFormat.jm().format(dt);
+}
+
+TimeOfDay stringToTimeOfDay(String ts) {
+  final format = DateFormat.jm(); //"6:00 AM"
+  return TimeOfDay.fromDateTime(format.parse(ts));
+}
+
+setNumberOfHrs(TimeOfDay startTime, TimeOfDay endTime) {
+  int smin = startTime.hour * 60 + startTime.minute;
+  int emin = endTime.hour * 60 + endTime.minute;
+  double diffmin = (emin - smin) / 60;
+  double _numberOfhrs = diffmin.toInt() + ((emin - smin) % 60) / 100;
+  //debugPrint('Utilities:setNumberOfHrs numberofHrs: $_numberOfhrs');
+  return _numberOfhrs;
 }

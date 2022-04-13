@@ -138,18 +138,7 @@ class ProjectsState extends State<Projects> {
   }
 }
 
-Future<List<ProjectDataModel>> getProjectList() async {
-  var projRepo = ProjectRepository();
-  List<ProjectDataModel> projectList = await projRepo.getAll();
-  return projectList;
-}
 
-getMaxProjectId(List<ProjectDataModel> pdmList){
-  var projectIdList = pdmList.map((e) => e.projectId).toList();
-  var maxProjectId = projectIdList.reduce(max);
-  debugPrint("Projects:getProjectList maxProjectId: $maxProjectId");
-  return maxProjectId;
-}
 
 showProjectDialog(BuildContext context, ProjectDataModel pdm, maxProjectId) {
   var projRepo = ProjectRepository();
