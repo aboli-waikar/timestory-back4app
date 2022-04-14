@@ -5,6 +5,8 @@ import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
 import 'package:timestory_back4app/util/Utilities.dart';
 import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
+import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
+import 'package:timestory_back4app/views/QuickAdd.dart';
 
 import '../model/TimeSheetDataModel.dart';
 
@@ -32,8 +34,8 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
   @override
   void initState() {
     super.initState();
-    debugPrint("In Init");
-    isNewTimeSheet = (widget.tsModel.objectId == null) ? true : false;
+    isNewTimeSheet = (widget.tsModel.objectId == "") ? true : false;
+    debugPrint("In Init: isNewTimeSheet: $isNewTimeSheet");
     getProjectList().then(
       (value) {
         setState(() {
@@ -65,11 +67,12 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
   selectDate(BuildContext context) async {
     final DateTime? d =
         await showDatePicker(context: context, initialDate: widget.tsModel.selectedDate, firstDate: DateTime(2000), lastDate: DateTime(2030));
-    debugPrint('InsertUpdateTimeSheet - d: $d');
+
     setState(() {
-      widget.tsModel.selectedDate = d!;
+      widget.tsModel.selectedDate = d!.toUtc();
+      debugPrint('InsertUpdateTimeSheet - dtoUTC: $widget.tsModel.selectedDate');
     });
-    return d;
+    //return d;
   }
 
   Future<void> _selectStartTime(BuildContext context) async {
@@ -95,17 +98,6 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
     }
   }
 
-  deleteButton() {
-    var delete = ElevatedButton(
-        onPressed: () {
-          tsRepo.delete(widget.tsModel);
-          Navigator.pop(context);
-          Navigator.pushReplacementNamed(context, '/');
-        },
-        child: const Text('Delete'));
-    return delete;
-  }
-
   @override
   Widget build(BuildContext context) {
     TextEditingController workDescriptionTextEditingController = TextEditingController()..text = widget.tsModel.workDescription;
@@ -117,7 +109,7 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
           decoration: const BoxDecoration(
               gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.red, Colors.orangeAccent])),
         ),
-        title: Text(widget.tsModel.objectId == null ? "Enter Timesheet" : "Update Timesheet"),
+        title: Text(widget.tsModel.objectId == "" ? "Enter Timesheet" : "Update Timesheet"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -191,21 +183,34 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                         widget.tsModel.workDescription = workDescriptionTextEditingController.text;
                         widget.tsModel.projectDM = (pdvmList.firstWhere((element) => element.projectIdName == projectSelected)).pdm;
 
-                        debugPrint("InsertUpdateTimeSheet:build tsModel= ${widget.tsModel}");
-                        if (widget.tsModel.objectId == null) {
+                        debugPrint("InsertUpdateTimeSheet:build tsModel= ${widget.tsModel.objectId}");
+                        if (widget.tsModel.objectId == "") {
                           tsRepo.create(widget.tsModel);
+                          Navigator.pop(context);
                         } else {
                           tsRepo.update(widget.tsModel);
+                          Navigator.pushAndRemoveUntil(
+                              context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 1)), (route) => false);
                         }
-                        Navigator.pop(context);
                         //Use PushReplacementNamed method to go back to the root page without back arrow in Appbar.
-                        Navigator.pushReplacementNamed(context, '/');
+                        //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) =>false);
+                        //Navigator.pushReplacementNamed(context, '/');
                       },
-                      child: Text(widget.tsModel.objectId == null ? 'Submit' : 'Update')),
+                      child: Text(widget.tsModel.objectId == "" ? 'Submit' : 'Update')),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: widget.tsModel.objectId == null ? deleteButton() : null,
-                  )
+                    child: ElevatedButton(
+                        onPressed: () {
+                          if(isNewTimeSheet) {
+                            Navigator.pushAndRemoveUntil(
+                                context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 4)), (route) => false);
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: const Text("Cancel")),
+                  ),
+
                 ],
               ),
             ),

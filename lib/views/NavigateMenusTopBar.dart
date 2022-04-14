@@ -24,6 +24,11 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
     Projects(),
     QuickAdd(),
   ];
+  @override
+  void initState() {
+    _currentPageIndex = widget.index;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

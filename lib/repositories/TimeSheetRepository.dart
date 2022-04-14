@@ -29,9 +29,8 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
     print("TimeSheetRepository:Update t: ${t.toString()}");
 
     await Future.delayed(Duration(seconds: 1), () {
-      var tsRepo = tsToPoConv.domainToUpdateParseObject(t);
-      var apiResponse = tsRepo.save();
-      //print("TimeSheetRepository:Update apiResponse: ${apiResponse.toString()}");
+      var tsPo = tsToPoConv.domainToUpdateParseObject(t);
+      var apiResponse = tsPo.save();
     });
 
   }
@@ -66,15 +65,20 @@ class TimeSheetRepository extends Repository<TimeSheetDataModel> {
   }
 
   Future<List<TimeSheetDataModel>> getAllWithProjectModel() async {
-    var projRepo = ProjectRepository();
-    List<TimeSheetDataModel> timeSheetList = await getAll();
     List<TimeSheetDataModel> tempTSList = [];
-    for (var t in timeSheetList) {
-      tempTSList.add(TimeSheetDataModel(
-          t.objectId, (await projRepo.getById(t.projectDM.objectId)), t.selectedDate, t.startTime, t.endTime, t.workDescription, t.numberOfHrs));
-    }
-    // print("TimeSheetRepository:getAllWithProjectModel ts: ${tempTSList.toString()}");
-    print("TimeSheetRepository:getAllWithProjectModel tsLength: ${tempTSList.length.toString()}");
+    var projRepo = ProjectRepository();
+
+    await Future.delayed(Duration(seconds: 3), () async{
+      List<TimeSheetDataModel> timeSheetList = await getAll();
+
+      for (var t in timeSheetList) {
+        tempTSList.add(TimeSheetDataModel(
+            t.objectId, (await projRepo.getById(t.projectDM.objectId)), t.selectedDate, t.startTime, t.endTime, t.workDescription, t.numberOfHrs));
+      }
+      //print("TimeSheetRepository:getAllWithProjectModel ts: ${tempTSList.toString()}");
+      print("TimeSheetRepository:getAllWithProjectModel tsLength: ${tempTSList.length.toString()}");
+
+    });
     return tempTSList;
   }
 

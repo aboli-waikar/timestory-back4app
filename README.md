@@ -18,4 +18,4 @@ samples, guidance on mobile development, and a full API reference.
 1. fuser -k 5000/tcp to kill the port
 2. User data flow views --> Repo --> use Converter --> back4App database
 3. Query data flow back4App --> converter --> repo --> views
-3. Update Timesheet not working, Time in correct for 2 pm 9.15 pm
+3. Delete progress dialog is not working

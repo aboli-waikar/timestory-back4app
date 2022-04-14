@@ -35,6 +35,7 @@ class TimeSheetParseObjectConverter implements DomainParseObjectConverterInterfa
   ParseObject domainToUpdateParseObject(TimeSheetDataModel t) {
     var timeSheet = ParseObject(_tableName)..objectId = t.objectId;
     _setPoProperties(timeSheet, t);
+    print("TimeSheetParseObjectConverter Update TimeSheet: ${timeSheet.toString()}");
     return timeSheet;
   }
 

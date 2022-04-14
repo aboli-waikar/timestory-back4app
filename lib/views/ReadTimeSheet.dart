@@ -35,28 +35,30 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
   var tsToPoConv = TimeSheetParseObjectConverter();
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void initState() {
     debugPrint("***ReadTimeSheet: InitState");
     super.initState();
-    getTimeSheetList().then((value) {
-      setState(() {
-        tsModelList = value;
-        tsvmList = tsModelList.map((tsModel) => TimeSheetViewModel(tsModel, false)).toList();
-      });
-    });
+    getTimeSheetFromDB();
   }
 
   projectDialog() {
     debugPrint("***ReadTimeSheet: projectDialog");
     getProjectList().then((value) {
-      setState(() {
-        List<ProjectDataModel> pdmList = value;
-        pdvmList = pdmList.map((pdm) => ProjectDataViewModel(pdm)).toList();
-        projectSelected = pdvmList[0].projectIdName!;
-        items = pdvmList.map((pdvm) {
-          return DropdownMenuItem(value: pdvm.projectIdName, child: Text(pdvm.projectIdName!));
-        }).toList();
-      });
+      if (mounted) {
+        setState(() {
+          List<ProjectDataModel> pdmList = value;
+          pdvmList = pdmList.map((pdm) => ProjectDataViewModel(pdm)).toList();
+          projectSelected = pdvmList[0].projectIdName!;
+          items = pdvmList.map((pdvm) {
+            return DropdownMenuItem(value: pdvm.projectIdName, child: Text(pdvm.projectIdName!));
+          }).toList();
+        });
+      }
     });
     showDialog(
       context: context,
@@ -92,7 +94,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     });
   }
 
-  showExportProgressDialog() {
+  showProgressDialog(String message) {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -101,7 +103,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
           content: Row(
             children: [
               const CircularProgressIndicator(),
-              Container(margin: const EdgeInsets.only(left: 10), child: const Text("Exporting to excel..")),
+              Container(margin: const EdgeInsets.only(left: 10), child: Text(message)),
             ],
           ),
         );
@@ -109,7 +111,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     );
   }
 
-  showExportCompleteDialog() {
+  showCompleteDialog(String message) {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -120,12 +122,14 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
               const CircularProgressIndicator(
                 value: 100.0,
               ),
-              Container(margin: const EdgeInsets.only(left: 10), child: const Text("Export completed")),
+              Container(margin: const EdgeInsets.only(left: 10), child: Text(message)),
             ],
           ),
         );
       },
+
     );
+
   }
 
   AppBar getAppBar() {
@@ -140,16 +144,14 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
         IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () async {
-              // List<void> tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList()
-              //     .map((e) => tsRepo.delete(e)).toList();
-
+              showProgressDialog("Delete in progress...");
               var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
-
               for (var tsModel in tsModelList) {
                 await tsRepo.delete(tsModel);
               }
+              showCompleteDialog("Selected timesheets deleted...");
+              //Navigator.pop(context);
 
-              Navigator.pushReplacementNamed(context, '/');
             }),
         IconButton(icon: const Icon(Icons.select_all_rounded), onPressed: () => selectAll()),
       ],
@@ -191,10 +193,21 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
   }
 
   Future<List<TimeSheetViewModel>> getTSData() async {
+    debugPrint("***ReadTimeSheet: getTSData");
     if (selectedMonth == null) {
       return tsvmList;
     } else {
       return tsvmList.where((element) => getMonth(element.tsModel.selectedDate) == getMonth(selectedMonth)).toList();
+    }
+  }
+
+  getTimeSheetFromDB() async {
+    debugPrint("***ReadTimeSheet: getTimeSheetList");
+    tsModelList = await getTimeSheetList();
+    if (mounted) {
+      setState(() {
+        tsvmList = tsModelList.map((tsModel) => TimeSheetViewModel(tsModel, false)).toList();
+      });
     }
   }
 
@@ -206,7 +219,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
       body: FutureBuilder<List<TimeSheetViewModel>>(
               future: getTSData(),
               builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.data == null) {
+                if (tsvmList.isEmpty) {
                   return const Center(
                     child: Text("Loading"),
                   );

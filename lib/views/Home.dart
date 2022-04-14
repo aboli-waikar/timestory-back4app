@@ -25,12 +25,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-
-    getProjectList().then((value) {
-      setState(() {
-        projectList = value;
-      });
-    });
+    getProjectData();
     getTSData();
   }
 
@@ -40,6 +35,14 @@ class _HomeState extends State<Home> {
       selectedMonth = d!;
       getTSData();
     });
+  }
+
+  getProjectData() async {
+    var x = await getProjectList();
+      setState(() {
+        projectList = x;
+      });
+
   }
 
   getTSData() async {
@@ -75,7 +78,6 @@ class _HomeState extends State<Home> {
     // String totalHrs = getHrsMin(tMin);
 
     var totalHrs = getHrsMin(_myData.fold(0, (num prev, ChartViewModel chViewModel) => prev + getMins(chViewModel.numberOfHrs)));
-
 
     return ListView(
       children: [
