@@ -1,4 +1,12 @@
+import 'dart:convert';
+
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart';
+import 'package:flutter/foundation.dart' as kIsWeb;
+import 'package:universal_html/html.dart' as html; //For Web download
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:timestory_back4app/converters/TimeSheetParseObjectConverter.dart';
@@ -6,11 +14,13 @@ import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
 import 'package:timestory_back4app/repositories/ProjectRepository.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
+import 'package:timestory_back4app/util/ExportTimeSheet.dart';
 import 'package:timestory_back4app/util/Utilities.dart';
 import 'package:timestory_back4app/viewModels/TimeSheetViewModel.dart';
 import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
+import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
 import 'InsertUpdateTimeSheet.dart';
-import 'package:timestory_back4app/views/Projects.dart';
+
 
 class ReadTimeSheet extends StatefulWidget {
   static String routeName = '/ReadTimeSheet';
@@ -94,42 +104,78 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     });
   }
 
-  showProgressDialog(String message) {
+  deleteTS() async {
+    dynamic contextToPop;
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext ctxt) {
+        contextToPop = ctxt;
         return AlertDialog(
           content: Row(
             children: [
               const CircularProgressIndicator(),
-              Container(margin: const EdgeInsets.only(left: 10), child: Text(message)),
+              Container(margin: const EdgeInsets.only(left: 10), child: Text("Delete in progress...")),
             ],
           ),
         );
       },
     );
+
+    var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
+    for (var tsModel in tsModelList) {
+      await tsRepo.delete(tsModel);
+    }
+
+    Navigator.of(contextToPop).pop();
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 1)), (route) => false);
   }
 
-  showCompleteDialog(String message) {
+  exportTS() async {
+    dynamic contextToPop;
     showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext ctxt) {
+        contextToPop = ctxt;
         return AlertDialog(
           content: Row(
             children: [
-              const CircularProgressIndicator(
-                value: 100.0,
-              ),
-              Container(margin: const EdgeInsets.only(left: 10), child: Text(message)),
+              const CircularProgressIndicator(),
+              Container(margin: const EdgeInsets.only(left: 10), child: Text("Export in progress...")),
             ],
           ),
         );
       },
-
     );
 
+    var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
+
+    var bytes = await exportToPDF(tsModelList, selectedMonth != null ? getMonth(selectedMonth) : ""); //Send Project name here
+    if(kIsWeb.kIsWeb) {
+      var base64str = base64Encode(bytes);
+      var url = "data:application/octet-stream;base64,$base64str";
+      html.AnchorElement anchor = html.document.createElement('a') as html.AnchorElement
+      ..href = url
+      ..style.display='none'
+      ..download = 'timeSheet.pdf';
+      html.document.body!.children.add(anchor);
+      anchor.click();
+      html.document.body!.children.remove(anchor);
+      html.Url.revokeObjectUrl(url);
+    }
+    else {
+      Directory documentDirectory = await getApplicationDocumentsDirectory();
+      String path = documentDirectory.path;
+      File file = File('$path/timesheet.pdf');
+      print(file.toString());
+      await file.writeAsBytes(bytes);
+      OpenFile.open('$path/timesheet.pdf');
+      return path;
+    }
+
+    Navigator.of(contextToPop).pop();
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 1)), (route) => false);
   }
 
   AppBar getAppBar() {
@@ -141,18 +187,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
       ),
       title: Text("$projectSelected", style: const TextStyle(fontSize: 16.0)),
       actions: [
-        IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () async {
-              showProgressDialog("Delete in progress...");
-              var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
-              for (var tsModel in tsModelList) {
-                await tsRepo.delete(tsModel);
-              }
-              showCompleteDialog("Selected timesheets deleted...");
-              //Navigator.pop(context);
-
-            }),
+        IconButton(icon: const Icon(Icons.delete), onPressed: () => deleteTS()),
         IconButton(icon: const Icon(Icons.select_all_rounded), onPressed: () => selectAll()),
       ],
     );
@@ -173,15 +208,12 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
           onPressed: () => selectMonth(context),
         ),
         IconButton(
-            icon: const Icon(
-              Icons.import_export_sharp,
-              color: Colors.white,
-            ),
-            onPressed: () async {
-              //var x = await exportToPDF(timesheetModels, selectedMonth != null ? getMonth(selectedMonth) : null); //Send Project name here
-              //debugPrint(x); //get filename here
-              //(x != null) ? showExportCompleteDialog() : showExportProgressDialog();
-            }),
+          icon: const Icon(
+            Icons.import_export_sharp,
+            color: Colors.white,
+          ),
+          onPressed: () => exportTS(),
+        ),
       ],
     );
 
@@ -215,59 +247,76 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
   Widget build(BuildContext context) {
     debugPrint("***ReadTimeSheet:Build");
     return Scaffold(
-      appBar: getAppBar(),
-      body: FutureBuilder<List<TimeSheetViewModel>>(
-              future: getTSData(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (tsvmList.isEmpty) {
-                  return const Center(
-                    child: Text("Loading"),
-                  );
-                } else {
-                  return ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                          leading: Checkbox(
-                            value: snapshot.data[index].isDelete,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                tsvmList[index].isDelete = newValue!;
-                                debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
-                              });
-                            },
-                          ),
-                          title: Column(children: [
-                            Row(
-                              children: [
-                                const Text("Project: ", style: TextStyle(fontSize: 13.0)),
-                                Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
-                                    style: const TextStyle(fontSize: 15.0)),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Text("Date: ", style: TextStyle(fontSize: 15.0)),
-                                Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
-                                Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
-                                    style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold))
-                              ],
-                            )
-                          ]),
-                          subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
-                            //Navigator.pushReplacementNamed(context, '/');
+        appBar: getAppBar(),
+        body: FutureBuilder<List<TimeSheetViewModel>>(
+          future: getTSData(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: Row(
+                  children: const [
+                    Text("Loading"),
+                    CircularProgressIndicator(),
+                  ],
+                ),
+              );
+            } else if (snapshot.hasData&&snapshot.data.isEmpty) {
+              return Center(
+                child: Row(
+                  children: const [
+                    Text("No data to display"),
+                    Image(image: AssetImage("images/CreateTimeSheet.png")),
+                  ],
+                ),
+              );
+            }
+
+
+            else {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                      leading: Checkbox(
+                        value: snapshot.data[index].isDelete,
+                        onChanged: (bool? newValue) {
+                          setState(() {
+                            tsvmList[index].isDelete = newValue!;
+                            debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
                           });
-                    },
-                  );
-                }
-              },)
-    );
+                        },
+                      ),
+                      title: Column(children: [
+                        Row(
+                          children: [
+                            const Text("Project: ", style: TextStyle(fontSize: 13.0)),
+                            Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
+                                style: const TextStyle(fontSize: 15.0)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Text("Date: ", style: TextStyle(fontSize: 15.0)),
+                            Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
+                            Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
+                                style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold))
+                          ],
+                        )
+                      ]),
+                      subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
+                        //Navigator.pushReplacementNamed(context, '/');
+                      });
+                },
+              );
+            }
+          },
+        ));
   }
 }

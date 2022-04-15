@@ -134,11 +134,11 @@ class Utilities {
 
 }
 
-selectedDate(DateTime dT) {
-  final DateFormat formatter = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-  var selectedDate = formatter.format(dT);
-  return selectedDate;
+formatDate(DateTime dt) {
+  var formatter = DateFormat('dd-MMM-yyyy');
+  return formatter.format(dt);
 }
+
 
 getMonth(DateTime dT) {
   final DateFormat formatter = DateFormat('yyyy-MM');
