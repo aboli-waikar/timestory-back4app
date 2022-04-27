@@ -8,6 +8,7 @@ import 'QuickAdd.dart';
 
 class NavigateMenuTopBar extends StatefulWidget {
   final index;
+
   const NavigateMenuTopBar({Key? key, this.index}) : super(key: key);
 
   @override
@@ -15,7 +16,6 @@ class NavigateMenuTopBar extends StatefulWidget {
 }
 
 class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
-
   int _currentPageIndex = 0;
   final List _widgetClasses = [
     Home(),
@@ -24,6 +24,7 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
     Projects(),
     QuickAdd(),
   ];
+
   @override
   void initState() {
     _currentPageIndex = widget.index;
@@ -41,22 +42,45 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
     }
 
     return MaterialApp(
-      home:Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size(_width, 150),
-          child: NavigationBar(
-            backgroundColor: Colors.yellow.shade50,
-            onDestinationSelected: onTapped,
-            selectedIndex: _currentPageIndex,
-            destinations: const [
-              NavigationDestination(icon: Icon(Icons.home, color: Colors.brown, size: 50), label: 'Home' ),
-              NavigationDestination(icon: Icon(Icons.update, color: Colors.brown, size: 50), label: 'TimeSheet'),
-              NavigationDestination(icon: Icon(Icons.money_outlined, color: Colors.brown, size: 50), label: 'Expenses'),
-              NavigationDestination(icon: Icon(Icons.home_work, color: Colors.brown, size: 50), label: 'Projects'),
-              NavigationDestination(icon: Icon(Icons.add_circle, color: Colors.brown, size: 50), label: 'Quick Add ')
-            ],
+        home: Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size(_width, 150),
+        child: NavigationBar(
+          backgroundColor: Colors.blue.shade500,
+          onDestinationSelected: onTapped,
+          selectedIndex: _currentPageIndex,
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.home, color: Colors.brown, size: 50),
+              label: 'Home',
+              selectedIcon: Icon(Icons.home, color: Colors.white, size: 50),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.update, color: Colors.brown, size: 50),
+              label: 'TimeSheet',
+              selectedIcon: Icon(Icons.update, color: Colors.white, size: 50),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.money_outlined, color: Colors.brown, size: 50),
+              label: 'Expenses',
+              selectedIcon: Icon(Icons.money_outlined, color: Colors.white, size: 50),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.home_work, color: Colors.brown, size: 50),
+              label: 'Projects',
+              selectedIcon: Icon(Icons.home_work, color: Colors.white, size: 50),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.add_circle, color: Colors.brown, size: 50),
+              label: 'Quick Add ',
+              selectedIcon: Icon(Icons.add_circle, color: Colors.white, size: 50),
+            )
+          ],
+        ),
       ),
-    ),
-        body: Center(child: _widgetClasses.elementAt(_currentPageIndex),),));
+      body: Center(
+        child: _widgetClasses.elementAt(_currentPageIndex),
+      ),
+    ));
   }
 }

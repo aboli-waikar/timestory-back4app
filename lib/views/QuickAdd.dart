@@ -49,7 +49,7 @@ class QuickAdd extends StatelessWidget {
                             child: ElevatedButton(
                                 child: Image.asset("images/StartTimer.png", height: 100, width: 100, alignment: Alignment.center),
                                 onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                                  //Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
                                 }),
                           )),
                     ],

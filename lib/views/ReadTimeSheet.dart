@@ -21,7 +21,6 @@ import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
 import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
 import 'InsertUpdateTimeSheet.dart';
 
-
 class ReadTimeSheet extends StatefulWidget {
   static String routeName = '/ReadTimeSheet';
 
@@ -56,20 +55,15 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     getTimeSheetFromDB();
   }
 
-  projectDialog() {
+  projectDialog() async {
     debugPrint("***ReadTimeSheet: projectDialog");
-    getProjectList().then((value) {
-      if (mounted) {
-        setState(() {
-          List<ProjectDataModel> pdmList = value;
-          pdvmList = pdmList.map((pdm) => ProjectDataViewModel(pdm)).toList();
-          projectSelected = pdvmList[0].projectIdName!;
-          items = pdvmList.map((pdvm) {
-            return DropdownMenuItem(value: pdvm.projectIdName, child: Text(pdvm.projectIdName!));
-          }).toList();
-        });
-      }
-    });
+    var pdmList = await getProjectList();
+    pdvmList = pdmList.map((pdm) => ProjectDataViewModel(pdm)).toList();
+    projectSelected = pdvmList[0].projectIdName!;
+    items = pdvmList.map((pdvm) {
+      return DropdownMenuItem(value: pdvm.projectIdName, child: Text(pdvm.projectIdName!));
+    }).toList();
+
     showDialog(
       context: context,
       builder: (context) {
@@ -86,6 +80,7 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
               });
             },
           ),
+          actions: [ElevatedButton(onPressed: () => Navigator.of(context).pop(), child: Text("OK"))],
         );
       },
     );
@@ -152,19 +147,18 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     var tsModelList = tsvmList.where((element) => element.isDelete == true).toList().map((e) => e.tsModel).toList();
 
     var bytes = await exportToPDF(tsModelList, selectedMonth != null ? getMonth(selectedMonth) : ""); //Send Project name here
-    if(kIsWeb.kIsWeb) {
+    if (kIsWeb.kIsWeb) {
       var base64str = base64Encode(bytes);
       var url = "data:application/octet-stream;base64,$base64str";
       html.AnchorElement anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display='none'
-      ..download = 'timeSheet.pdf';
+        ..href = url
+        ..style.display = 'none'
+        ..download = 'timeSheet.pdf';
       html.document.body!.children.add(anchor);
       anchor.click();
       html.document.body!.children.remove(anchor);
       html.Url.revokeObjectUrl(url);
-    }
-    else {
+    } else {
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String path = documentDirectory.path;
       File file = File('$path/timesheet.pdf');
@@ -178,44 +172,50 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 1)), (route) => false);
   }
 
-  AppBar getAppBar() {
+  PreferredSize getAppBar() {
     debugPrint("***ReadTimeSheet:getAppBar");
-    var appBarWithDeleteIcon = AppBar(
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.red, Colors.orangeAccent])),
+    PreferredSize appBarWithDeleteIcon = PreferredSize(
+      preferredSize: Size(MediaQuery.of(context).size.width, 70),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text("$projectSelected", style: const TextStyle(fontSize: 16.0)),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () => deleteTS(),
+            tooltip: "DELETE",
+          ),
+          IconButton(
+            icon: const Icon(Icons.select_all_rounded),
+            onPressed: () => selectAll(),
+            tooltip: "SELECT ALL",
+          ),
+        ],
       ),
-      title: Text("$projectSelected", style: const TextStyle(fontSize: 16.0)),
-      actions: [
-        IconButton(icon: const Icon(Icons.delete), onPressed: () => deleteTS()),
-        IconButton(icon: const Icon(Icons.select_all_rounded), onPressed: () => selectAll()),
-      ],
     );
 
-    var appBar = AppBar(
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Colors.red, Colors.orangeAccent])),
-      ),
-      title: Text("$projectSelected", style: const TextStyle(fontSize: 16.0)),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.work_outline, color: Colors.white),
-          onPressed: () => projectDialog(),
-        ),
-        IconButton(
-          icon: const Icon(Icons.calendar_today, color: Colors.white),
-          onPressed: () => selectMonth(context),
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.import_export_sharp,
-            color: Colors.white,
+    PreferredSize appBar = PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 70),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Column(children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text("PROJECT SELECTED: $projectSelected  ", style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+            ),
+          ]),
+          Column(
+            children: [
+              Row(
+                children: [
+                  IconButton(icon: const Icon(Icons.work_outline, color: Colors.black), onPressed: () => projectDialog(), tooltip: "SELECT PROJECT"),
+                  IconButton(
+                      icon: const Icon(Icons.calendar_today, color: Colors.black), onPressed: () => selectMonth(context), tooltip: "SELECT MONTH"),
+                  IconButton(icon: const Icon(Icons.import_export_sharp, color: Colors.black), onPressed: () => exportTS(), tooltip: "EXPORT"),
+                ],
+              ),
+            ],
           ),
-          onPressed: () => exportTS(),
-        ),
-      ],
-    );
+        ]));
 
     if (tsvmList.any((element) => element.isDelete == true)) {
       return appBarWithDeleteIcon;
@@ -252,27 +252,23 @@ class _ReadTimeSheetState extends State<ReadTimeSheet> {
           future: getTSData(),
           builder: (context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
+              return const Center(
+                child: Text("Loading"),
+              );
+            } else if (snapshot.hasData && snapshot.data.isEmpty) {
               return Center(
-                child: Row(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Text("Loading"),
-                    CircularProgressIndicator(),
+                    SizedBox(width: 100, height: 100, child: Image(image: AssetImage("images/CreateTimeSheet.png"))),
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text("No data to display"),
+                    ),
                   ],
                 ),
               );
-            } else if (snapshot.hasData&&snapshot.data.isEmpty) {
-              return Center(
-                child: Row(
-                  children: const [
-                    Text("No data to display"),
-                    Image(image: AssetImage("images/CreateTimeSheet.png")),
-                  ],
-                ),
-              );
-            }
-
-
-            else {
+            } else {
               return ListView.builder(
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, index) {

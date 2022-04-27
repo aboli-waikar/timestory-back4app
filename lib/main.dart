@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
@@ -21,6 +22,7 @@ void main() async {
   const parseServerUrl = 'https://parseapi.back4app.com';
 
   await Parse().initialize(keyApplicationId, parseServerUrl, clientKey: keuClientKey, autoSendSessionId: true);
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
   runApp(const TimeStoryApp());
 }
@@ -63,7 +65,8 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
     return MaterialApp(
         title: 'TimeSheet',
         theme: ThemeData(
-            scrollbarTheme: ScrollbarThemeData(thumbColor: MaterialStateProperty.all(Colors.black)),
+          navigationBarTheme: const NavigationBarThemeData(indicatorColor: Colors.green),
+          scrollbarTheme: ScrollbarThemeData(thumbColor: MaterialStateProperty.all(Colors.black)),
             inputDecorationTheme: const InputDecorationTheme(
               filled: true,
               fillColor: Colors.white,
