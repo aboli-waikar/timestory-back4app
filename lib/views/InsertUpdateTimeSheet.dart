@@ -190,7 +190,7 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                         } else {
                           tsRepo.update(widget.tsModel);
                           Navigator.pushAndRemoveUntil(
-                              context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 1)), (route) => false);
+                              context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 0)), (route) => false);
                         }
                         //Use PushReplacementNamed method to go back to the root page without back arrow in Appbar.
                         //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) =>false);
@@ -203,7 +203,7 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                         onPressed: () {
                           if(isNewTimeSheet) {
                             Navigator.pushAndRemoveUntil(
-                                context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 4)), (route) => false);
+                                context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 0)), (route) => false);
                           } else {
                             Navigator.pop(context);
                           }

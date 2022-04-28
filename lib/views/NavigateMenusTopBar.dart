@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
 import 'package:timestory_back4app/views/Home.dart';
 import 'package:timestory_back4app/views/Projects.dart';
-import 'package:timestory_back4app/views/ReadTimeSheet.dart';
 
 import 'QuickAdd.dart';
 
@@ -19,7 +18,6 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
   int _currentPageIndex = 0;
   final List _widgetClasses = [
     Home(),
-    ReadTimeSheet(),
     Expenses(),
     Projects(),
     QuickAdd(),
@@ -54,11 +52,6 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
               icon: Icon(Icons.home, color: Colors.brown, size: 50),
               label: 'Home',
               selectedIcon: Icon(Icons.home, color: Colors.white, size: 50),
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.update, color: Colors.brown, size: 50),
-              label: 'TimeSheet',
-              selectedIcon: Icon(Icons.update, color: Colors.white, size: 50),
             ),
             NavigationDestination(
               icon: Icon(Icons.money_outlined, color: Colors.brown, size: 50),

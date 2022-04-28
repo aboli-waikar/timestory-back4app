@@ -58,7 +58,8 @@ class _HomeState extends State<Home> {
     final DateTime? d = await showMonthPicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2030));
     if (mounted) {
       setState(() {
-        selectedMonth = d!;
+        if(d != null)
+        selectedMonth = d;
         getTSData();
       });
     }
@@ -152,14 +153,14 @@ class _HomeState extends State<Home> {
       _myData = tsModelList
           .where((tsModel) => getMonth(tsModel.selectedDate) == getMonth(selectedMonth))
           .toList()
-          .where((tsModel) => ProjectDataViewModel(tsModel.projectDM).projectIdName == selectedProject)
+          //.where((tsModel) => ProjectDataViewModel(tsModel.projectDM).projectIdName == selectedProject)
           .map((tsModel) => ChartViewModel(tsModel.selectedDate, tsModel.numberOfHrs, "${tsModel.projectDM.projectId} - ${tsModel.projectDM.name}"))
           .toList();
     });
     //debugPrint('MyData: ${_myData.join(", ").toString()}');
 
     if (selectedProject == '') {
-      return tsvmList;
+      return tsvmList.where((element) => getMonth(element.tsModel.selectedDate) == getMonth(selectedMonth)).toList();
     } else {
       return tsvmList
           .where((element) => getMonth(element.tsModel.selectedDate) == getMonth(selectedMonth))
@@ -185,7 +186,8 @@ class _HomeState extends State<Home> {
     // var tMin = _myData.fold(0, (num prev, ChartViewModel chViewModel) => prev + chViewModel.getMins());
     // String totalHrs = getHrsMin(tMin);
 
-    var totalHrs = getHrsMin(_myData.fold(0, (num prev, ChartViewModel chViewModel) => prev + getMins(chViewModel.numberOfHrs)));
+    var totalHrs = getHrsMin(_myData.fold(
+        0, (num prev, ChartViewModel chViewModel) => prev + getMins((chViewModel.projectIdName == projectName) ? chViewModel.numberOfHrs : 0)));
 
     return ListView(
       children: [
@@ -329,95 +331,116 @@ class _HomeState extends State<Home> {
     debugPrint("In Build Widget");
     return Scaffold(
         appBar: getAppBar(),
-        body: Column(
-          children: [
-            ListView(
-              shrinkWrap: true,
-              children: [
-                Container(
-                  height: 222,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: pdvmList.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(children: [
-                          Text('${pdvmList[index].projectIdName}'),
-                          ClipRRect(
-                              borderRadius: BorderRadius.circular(5.0),
-                              child: Container(
-                                  //color: Theme.of(context).colorScheme.background,
-                                  padding: MediaQuery.of(context).padding,
-                                  child: getTSChart('${pdvmList[index].projectIdName}'),
-                                  //child: getTSChart(),
-                                  height: 185,
-                                  width: 200))
-                        ]),
-                      );
-                    },
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Expanded(
+                flex: 0,
+                child: Card(
+                  child: Container(
+                    color: Colors.green,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Number of Records: ${tsvmList.length}", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                          Text("Month: ${getMonthStr(selectedMonth)}",style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
-            FutureBuilder<List<TimeSheetViewModel>>(
-              future: getTSData(),
-              builder: (context, AsyncSnapshot snapshot) {
-//                if (!snapshot.hasData) {
-                if (tsvmList.length ==0) {
-                  return Container(
-                    height: 500,
-                    child: const Text("No data to display!"),
-                  );
-                } else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                          leading: Checkbox(
-                            value: snapshot.data[index].isDelete,
-                            onChanged: (bool? newValue) {
-                              setState(() {
-                                tsvmList[index].isDelete = newValue!;
-                                debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
-                              });
-                            },
-                          ),
-                          title: Column(children: [
-                            Row(
-                              children: [
-                                const Text("Project: ", style: TextStyle(fontSize: 13.0)),
-                                Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
-                                    style: const TextStyle(fontSize: 15.0)),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Text("Date: ", style: TextStyle(fontSize: 15.0)),
-                                Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
-                                Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
-                                    style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold))
-                              ],
-                            )
+              ),
+              ListView(
+                shrinkWrap: true,
+                children: [
+                  Container(
+                    height: 222,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: pdvmList.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(children: [
+                            Text('${pdvmList[index].projectIdName}'),
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(5.0),
+                                child: Container(
+                                    //color: Theme.of(context).colorScheme.background,
+                                    padding: MediaQuery.of(context).padding,
+                                    child: getTSChart('${pdvmList[index].projectIdName}'),
+                                    //child: getTSChart(),
+                                    height: 185,
+                                    width: 200))
                           ]),
-                          subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
-                            //Navigator.pushReplacementNamed(context, '/');
-                          });
-                    },
-                  );
-                }
-              },
-            ),
-          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              FutureBuilder<List<TimeSheetViewModel>>(
+                future: getTSData(),
+                builder: (context, AsyncSnapshot snapshot) {
+//                if (!snapshot.hasData) {
+                  if (tsvmList.length ==0) {
+                    return Container(
+                      height: 500,
+                      child: const Text("No data to display!"),
+                    );
+                  } else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                            leading: Checkbox(
+                              value: snapshot.data[index].isDelete,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  tsvmList[index].isDelete = newValue!;
+                                  debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
+                                });
+                              },
+                            ),
+                            title: Column(children: [
+                              Row(
+                                children: [
+                                  const Text("Project: ", style: TextStyle(fontSize: 13.0)),
+                                  Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
+                                      style: const TextStyle(fontSize: 15.0)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text("Date: ", style: TextStyle(fontSize: 15.0)),
+                                  Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
+                                  Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
+                                      style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold))
+                                ],
+                              )
+                            ]),
+                            subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
+                              //Navigator.pushReplacementNamed(context, '/');
+                            });
+                      },
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ));
   }
 }

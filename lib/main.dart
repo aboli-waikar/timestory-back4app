@@ -8,7 +8,6 @@ import 'package:timestory_back4app/views/PageRoutes.dart';
 import 'package:timestory_back4app/views/NavigateMenus.dart';
 import 'package:timestory_back4app/views/Login.dart';
 import 'package:timestory_back4app/views/Home.dart';
-import 'package:timestory_back4app/views/ReadTimeSheet.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
 import 'package:timestory_back4app/views/Profile.dart';
 
@@ -93,7 +92,6 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
         routes: {
           PageRoutes.login: (context) => const Login(),
           PageRoutes.home: (context) => Home(),
-          PageRoutes.readTimeSheet: (context) => ReadTimeSheet(),
           PageRoutes.expenses: (context) => Expenses(),
           PageRoutes.profile: (context) => Profile(),
         });
