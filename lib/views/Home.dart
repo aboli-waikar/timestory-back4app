@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' as kIsWeb;
 import 'package:open_file/open_file.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
+import 'package:timestory_back4app/views/NavigationDrawer.dart';
 import 'package:universal_html/html.dart' as html; //For Web download
 import 'package:charts_flutter/flutter.dart' as Charts;
 import 'package:path_provider/path_provider.dart';
@@ -330,6 +331,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     debugPrint("In Build Widget");
     return Scaffold(
+        drawer: NavigationDrawer(),
         appBar: getAppBar(),
         body: SingleChildScrollView(
           child: Column(

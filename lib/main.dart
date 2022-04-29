@@ -10,6 +10,11 @@ import 'package:timestory_back4app/views/Login.dart';
 import 'package:timestory_back4app/views/Home.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
 import 'package:timestory_back4app/views/Profile.dart';
+import 'package:side_navigation/side_navigation.dart';
+import 'package:timestory_back4app/views/Projects.dart';
+import 'package:timestory_back4app/views/QuickAdd.dart';
+
+import 'views/NavigationDrawer.dart';
 
 //http:localhost:5000
 
@@ -59,6 +64,50 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
     }
   }
 
+  SideNavigationPage() {
+
+    int _currentPageIndex = 0;
+    final List _widgetClasses = [
+      Home(),
+      Expenses(),
+      Projects(),
+      QuickAdd(),
+    ];
+
+
+    return Row(
+      children: [
+        SideNavigationBar(
+          selectedIndex: _currentPageIndex,
+          onTap: (index) {
+            setState(() {
+              _currentPageIndex = index;
+            });
+          },
+          items: const [
+            SideNavigationBarItem(
+              icon: Icons.home,
+              label: 'Home',
+            ),
+            SideNavigationBarItem(
+              icon: Icons.money_outlined,
+              label: 'Expenses',
+            ),
+            SideNavigationBarItem(
+              icon: Icons.home_work,
+              label: 'Projects',
+            ),
+            SideNavigationBarItem(
+              icon: Icons.add_circle,
+              label: 'Quick Add',
+            ),
+          ],
+        ),
+        Expanded(child: _widgetClasses.elementAt(_currentPageIndex),)
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -66,26 +115,27 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
         theme: ThemeData(
           navigationBarTheme: const NavigationBarThemeData(indicatorColor: Colors.green),
           scrollbarTheme: ScrollbarThemeData(thumbColor: MaterialStateProperty.all(Colors.black)),
-            inputDecorationTheme: const InputDecorationTheme(
-              filled: true,
-              fillColor: Colors.white,
-              labelStyle: TextStyle(fontSize: 18),
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          inputDecorationTheme: const InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.white,
+            labelStyle: TextStyle(fontSize: 18),
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              fixedSize: MaterialStateProperty.all<Size>(const Size.fromWidth(80)),
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
+              shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))),
             ),
-            elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ButtonStyle(
-                    fixedSize: MaterialStateProperty.all<Size>(const Size.fromWidth(80)),
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))),
-                ),),
-          textTheme: const TextTheme(bodyLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.bold) ),
+          ),
+          textTheme: const TextTheme(bodyLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),
         home: Scaffold(
           body: Center(
             child: isBusy
                 ? const CircularProgressIndicator()
                 : isLoggedIn
-                    ? NavigateMenuTopBar(index: 0) //NavigateMenus()
+                    ? SideNavigationPage() //NavigateMenuTopBar(index: 0) //NavigateMenus()
                     : const Login(),
           ),
         ),

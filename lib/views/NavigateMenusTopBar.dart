@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
 import 'package:timestory_back4app/views/Home.dart';
 import 'package:timestory_back4app/views/Projects.dart';
 
+import 'NavigationDrawer.dart';
 import 'QuickAdd.dart';
 
 class NavigateMenuTopBar extends StatefulWidget {
@@ -39,8 +41,7 @@ class _NavigateMenuTopBarState extends State<NavigateMenuTopBar> {
       });
     }
 
-    return MaterialApp(
-        home: Scaffold(
+    return MaterialApp(home: Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(_width, 150),
         child: NavigationBar(

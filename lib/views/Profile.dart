@@ -27,16 +27,11 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    getUserData();
+    getUserDataFromDB();
   }
 
-  getUserData() async {
-    var uToPoConv = UserParseObjectConverter();
-    final timeStoryUser = await ParseUser.currentUser() as ParseUser;
-    debugPrint("Profile - $timeStoryUser");
-    UserDataModel x = uToPoConv.parseObjectToDomain(timeStoryUser); //Not getting user values here
-    debugPrint("Profile - Username - ${x.username}");
-
+  getUserDataFromDB() async {
+    var x = await getUserData();
     setState(() {
       isLoggedIn = true;
       imgUrl = x.photoUrl;

@@ -8,7 +8,9 @@ import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
 import 'package:timestory_back4app/repositories/ProjectRepository.dart';
 import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
+import '../converters/UserParseObjectConverter.dart';
 import '../main.dart';
+import '../model/UserDataModel.dart';
 import '../repositories/TimeSheetRepository.dart';
 
 class Utilities {
@@ -150,6 +152,15 @@ getMonthStr(DateTime dT) {
   final DateFormat formatter = DateFormat('MMM-yyyy');
   var yearMonth = formatter.format(dT);
   return yearMonth;
+}
+
+getUserData() async {
+  var uToPoConv = UserParseObjectConverter();
+  final timeStoryUser = await ParseUser.currentUser() as ParseUser;
+  debugPrint("Profile - $timeStoryUser");
+  UserDataModel udm = uToPoConv.parseObjectToDomain(timeStoryUser); //Not getting user values here
+  debugPrint("Profile - Username - ${udm.username}");
+  return udm;
 }
 
 Future<List<TimeSheetDataModel>> getTimeSheetList() async {
