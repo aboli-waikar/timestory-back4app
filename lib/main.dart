@@ -3,22 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
+import 'package:timestory_back4app/converters/UserParseObjectConverter.dart';
+import 'package:timestory_back4app/model/UserDataModel.dart';
 import 'package:timestory_back4app/views/PageRoutes.dart';
-import 'package:timestory_back4app/views/NavigateMenus.dart';
 import 'package:timestory_back4app/views/Login.dart';
 import 'package:timestory_back4app/views/Home.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
 import 'package:timestory_back4app/views/Profile.dart';
-import 'package:side_navigation/side_navigation.dart';
-import 'package:timestory_back4app/views/Projects.dart';
-import 'package:timestory_back4app/views/QuickAdd.dart';
-
-import 'views/NavigationDrawer.dart';
-
-//http:localhost:5000
-
-//const secureStorage = FlutterSecureStorage();
+import 'views/SideNavigation.dart';
 
 void main() async {
   const keyApplicationId = "NlPHrKFNMM8jUIM3A48yxGB3pQghhPOOrwC7xVSZ";
@@ -41,6 +33,7 @@ class TimeStoryApp extends StatefulWidget {
 class _TimeStoryAppState extends State<TimeStoryApp> {
   bool isBusy = false;
   bool isLoggedIn = false;
+  late UserDataModel timeStoryUser;
 
   @override
   void initState() {
@@ -49,63 +42,18 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
   }
 
   Future<void> initAction() async {
-    final timeStoryUser = await ParseUser.currentUser() as ParseUser;
-    debugPrint('TimeStoryUser from Main: ${timeStoryUser.username}');
-
-    // final String? storedUIDToken = await secureStorage.read(key: 'uid');
-    // debugPrint('From main storedUIDToken: $storedUIDToken');
-    if (timeStoryUser == null) {
+    var uToPoConv = UserParseObjectConverter();
+    final parseUser = await ParseUser.currentUser() as ParseUser;
+    debugPrint('TimeStoryUser from Main: ${parseUser.username}');
+    if (parseUser == null) {
       return;
     } else {
       setState(() {
         isBusy = false;
         isLoggedIn = true;
+        timeStoryUser = uToPoConv.parseObjectToDomain(parseUser);
       });
     }
-  }
-
-  SideNavigationPage() {
-
-    int _currentPageIndex = 0;
-    final List _widgetClasses = [
-      Home(),
-      Expenses(),
-      Projects(),
-      QuickAdd(),
-    ];
-
-
-    return Row(
-      children: [
-        SideNavigationBar(
-          selectedIndex: _currentPageIndex,
-          onTap: (index) {
-            setState(() {
-              _currentPageIndex = index;
-            });
-          },
-          items: const [
-            SideNavigationBarItem(
-              icon: Icons.home,
-              label: 'Home',
-            ),
-            SideNavigationBarItem(
-              icon: Icons.money_outlined,
-              label: 'Expenses',
-            ),
-            SideNavigationBarItem(
-              icon: Icons.home_work,
-              label: 'Projects',
-            ),
-            SideNavigationBarItem(
-              icon: Icons.add_circle,
-              label: 'Quick Add',
-            ),
-          ],
-        ),
-        Expanded(child: _widgetClasses.elementAt(_currentPageIndex),)
-      ],
-    );
   }
 
   @override
@@ -135,7 +83,7 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
             child: isBusy
                 ? const CircularProgressIndicator()
                 : isLoggedIn
-                    ? SideNavigationPage() //NavigateMenuTopBar(index: 0) //NavigateMenus()
+                    ? SideNavigationPage(index: 0, timeStoryUser: timeStoryUser,) //NavigateMenuTopBar(index: 0) //NavigateMenus()
                     : const Login(),
           ),
         ),

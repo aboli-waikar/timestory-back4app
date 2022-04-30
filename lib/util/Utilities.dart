@@ -7,14 +7,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/model/TimeSheetDataModel.dart';
 import 'package:timestory_back4app/repositories/ProjectRepository.dart';
-import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
 import '../converters/UserParseObjectConverter.dart';
 import '../main.dart';
 import '../model/UserDataModel.dart';
 import '../repositories/TimeSheetRepository.dart';
 
 class Utilities {
-  var _success=false;
+  var _success = false;
   var googleUser;
 
   showMessage(BuildContext context, String message) {
@@ -44,7 +43,7 @@ class Utilities {
       {
         _success = true;
         showMessage(context, "Registration successful");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
       }
     } else {
       _success = false;
@@ -59,7 +58,7 @@ class Utilities {
       {
         _success = true;
         showMessage(context, "Login successful");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
       }
     } else {
       _success = false;
@@ -82,7 +81,6 @@ class Utilities {
     var accesstoken = await googleUserAuth.accessToken;
     var idtoken = await googleUserAuth.idToken;
 
-
     Map<String, String> googleAuthData = {
       "id": googleUser.id,
       "id_token": idtoken,
@@ -93,7 +91,7 @@ class Utilities {
     };
 
     // Provide Google User Authentication Credentials to back4app
-    var response = await ParseUser.loginWith("google", googleAuthData);
+    ParseResponse response = await ParseUser.loginWith("google", googleAuthData);
 
     if (response.success) {
       {
@@ -101,7 +99,7 @@ class Utilities {
         updateGoogleUser(googleAuthData);
         _success = true;
         showMessage(context, "Login successful");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) => false);
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
       }
     } else {
       _success = false;
@@ -133,14 +131,12 @@ class Utilities {
     timeStoryUser.set("photoUrl", googleAuthData["photoUrl"]);
     await timeStoryUser.save();
   }
-
 }
 
 formatDate(DateTime dt) {
   var formatter = DateFormat('dd-MMM-yyyy');
   return formatter.format(dt);
 }
-
 
 getMonth(DateTime dT) {
   final DateFormat formatter = DateFormat('yyyy-MM');
@@ -175,7 +171,7 @@ Future<List<ProjectDataModel>> getProjectList() async {
   return projectList;
 }
 
-getMaxProjectId(List<ProjectDataModel> pdmList){
+getMaxProjectId(List<ProjectDataModel> pdmList) {
   var projectIdList = pdmList.map((e) => e.projectId).toList();
   var maxProjectId = projectIdList.reduce(max);
   debugPrint("Projects:getProjectList maxProjectId: $maxProjectId");

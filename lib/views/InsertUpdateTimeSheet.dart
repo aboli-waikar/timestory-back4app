@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:timestory_back4app/main.dart';
 import 'package:timestory_back4app/model/ProjectDataModel.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
 import 'package:timestory_back4app/util/Utilities.dart';
 import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
-import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
-import 'package:timestory_back4app/views/QuickAdd.dart';
 
 import '../model/TimeSheetDataModel.dart';
 
@@ -189,11 +188,9 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                           Navigator.pop(context);
                         } else {
                           tsRepo.update(widget.tsModel);
-                          Navigator.pushAndRemoveUntil(
-                              context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 0)), (route) => false);
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
                         }
                         //Use PushReplacementNamed method to go back to the root page without back arrow in Appbar.
-                        //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigateMenuTopBar(index: 0)), (route) =>false);
                         //Navigator.pushReplacementNamed(context, '/');
                       },
                       child: Text(widget.tsModel.objectId == "" ? 'Submit' : 'Update')),
@@ -202,8 +199,7 @@ class InsertUpdateTimeSheetState extends State<InsertUpdateTimeSheet> {
                     child: ElevatedButton(
                         onPressed: () {
                           if(isNewTimeSheet) {
-                            Navigator.pushAndRemoveUntil(
-                                context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 0)), (route) => false);
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
                           } else {
                             Navigator.pop(context);
                           }

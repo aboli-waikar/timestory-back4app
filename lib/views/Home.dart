@@ -3,8 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' as kIsWeb;
 import 'package:open_file/open_file.dart';
+import 'package:timestory_back4app/main.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
-import 'package:timestory_back4app/views/NavigationDrawer.dart';
+import 'package:timestory_back4app/views/SideNavigation.dart';
 import 'package:universal_html/html.dart' as html; //For Web download
 import 'package:charts_flutter/flutter.dart' as Charts;
 import 'package:path_provider/path_provider.dart';
@@ -17,7 +18,6 @@ import 'package:timestory_back4app/util/Utilities.dart';
 import 'package:timestory_back4app/viewModels/ProjectDataViewModel.dart';
 import 'package:timestory_back4app/viewModels/TimeSheetViewModel.dart';
 import 'package:timestory_back4app/views/InsertUpdateTimeSheet.dart';
-import 'package:timestory_back4app/views/NavigateMenusTopBar.dart';
 
 import '../model/ChartViewModel.dart';
 import '../model/TimeSheetDataModel.dart';
@@ -236,7 +236,7 @@ class _HomeState extends State<Home> {
     }
 
     Navigator.of(contextToPop).pop();
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 1)), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
   }
 
   exportTS() async {
@@ -283,7 +283,7 @@ class _HomeState extends State<Home> {
     }
 
     Navigator.of(contextToPop).pop();
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigateMenuTopBar(index: 1)), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
   }
 
   PreferredSize getAppBar() {
@@ -331,7 +331,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     debugPrint("In Build Widget");
     return Scaffold(
-        drawer: NavigationDrawer(),
         appBar: getAppBar(),
         body: SingleChildScrollView(
           child: Column(
@@ -392,7 +391,7 @@ class _HomeState extends State<Home> {
                   if (tsvmList.length ==0) {
                     return Container(
                       height: 500,
-                      child: const Text("No data to display!"),
+                      child: const Text("Wait till data loads else create Timesheet!"),
                     );
                   } else {
                     return ListView.builder(
