@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart' as kIsWeb;
 import 'package:open_file/open_file.dart';
 import 'package:timestory_back4app/main.dart';
 import 'package:timestory_back4app/repositories/TimeSheetRepository.dart';
-import 'package:timestory_back4app/views/SideNavigation.dart';
 import 'package:universal_html/html.dart' as html; //For Web download
 import 'package:charts_flutter/flutter.dart' as Charts;
 import 'package:path_provider/path_provider.dart';
@@ -22,16 +21,16 @@ import 'package:timestory_back4app/views/InsertUpdateTimeSheet.dart';
 import '../model/ChartViewModel.dart';
 import '../model/TimeSheetDataModel.dart';
 
-class Home extends StatefulWidget {
-  static String routeName = '/Home';
+class TimeSheet extends StatefulWidget {
+  static String routeName = '/TimeSheet';
 
-  const Home({kIsWeb.Key? key}) : super(key: key);
+  const TimeSheet({kIsWeb.Key? key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
+  _TimeSheetState createState() => _TimeSheetState();
 }
 
-class _HomeState extends State<Home> {
+class _TimeSheetState extends State<TimeSheet> {
   var chModel = ChartViewModel(DateTime.now(), 0, "");
   List<ChartViewModel> _myData = [ChartViewModel(DateTime.now(), 0, "")];
   DateTime selectedMonth = DateTime.now();
@@ -59,8 +58,7 @@ class _HomeState extends State<Home> {
     final DateTime? d = await showMonthPicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2030));
     if (mounted) {
       setState(() {
-        if(d != null)
-        selectedMonth = d;
+        if (d != null) selectedMonth = d;
         getTSData();
       });
     }
@@ -154,7 +152,7 @@ class _HomeState extends State<Home> {
       _myData = tsModelList
           .where((tsModel) => getMonth(tsModel.selectedDate) == getMonth(selectedMonth))
           .toList()
-          //.where((tsModel) => ProjectDataViewModel(tsModel.projectDM).projectIdName == selectedProject)
+      //.where((tsModel) => ProjectDataViewModel(tsModel.projectDM).projectIdName == selectedProject)
           .map((tsModel) => ChartViewModel(tsModel.selectedDate, tsModel.numberOfHrs, "${tsModel.projectDM.projectId} - ${tsModel.projectDM.name}"))
           .toList();
     });
@@ -178,7 +176,7 @@ class _HomeState extends State<Home> {
         id: 'chart000',
         domainFn: (ChartViewModel chViewModel, _) => (chViewModel.projectIdName == projectName) ? chViewModel.Date : DateTime.now(),
         measureFn: (ChartViewModel chViewModel, _) => (chViewModel.projectIdName == projectName) ? chViewModel.numberOfHrs : 0,
-        colorFn: (ChartViewModel chViewModel, _) => Charts.MaterialPalette.green.shadeDefault,
+        //colorFn: (ChartViewModel chViewModel, _) => Charts.MaterialPalette.green.shadeDefault,
         data: _myData,
       ),
     ];
@@ -192,20 +190,20 @@ class _HomeState extends State<Home> {
 
     return ListView(
       children: [
-        Container(
+        SizedBox(
           height: 150,
           child: Charts.TimeSeriesChart(
             seriesList,
             animate: true,
             defaultRenderer:
-                Charts.BarRendererConfig<DateTime>(groupingType: Charts.BarGroupingType.stacked, cornerStrategy: const Charts.ConstCornerStrategy(2)),
+            Charts.BarRendererConfig<DateTime>(groupingType: Charts.BarGroupingType.stacked, cornerStrategy: const Charts.ConstCornerStrategy(2)),
             domainAxis: const Charts.DateTimeAxisSpec(tickProviderSpec: Charts.DayTickProviderSpec(increments: [2])),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
-              child: Text("$currentMonth : $totalHrs", style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold))),
+              child: Text("$currentMonth : $totalHrs", style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold))),
         ),
       ],
     );
@@ -236,7 +234,7 @@ class _HomeState extends State<Home> {
     }
 
     Navigator.of(contextToPop).pop();
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const TimeStoryApp()), (route) => false);
   }
 
   exportTS() async {
@@ -283,7 +281,7 @@ class _HomeState extends State<Home> {
     }
 
     Navigator.of(contextToPop).pop();
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => TimeStoryApp()), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const TimeStoryApp()), (route) => false);
   }
 
   PreferredSize getAppBar() {
@@ -338,18 +336,15 @@ class _HomeState extends State<Home> {
               Expanded(
                 flex: 0,
                 child: Card(
-                  child: Container(
-                    color: Colors.green,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Number of Records: ${tsvmList.length}", style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                          Text("Month: ${getMonthStr(selectedMonth)}",style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Number of Records: ${tsvmList.length}", style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                        //Text("Month: ${getMonthStr(selectedMonth)}",style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                      ],
                     ),
                   ),
                 ),
@@ -357,27 +352,29 @@ class _HomeState extends State<Home> {
               ListView(
                 shrinkWrap: true,
                 children: [
-                  Container(
-                    height: 222,
+                  SizedBox(
+                    height: 240,
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
                       itemCount: pdvmList.length,
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(children: [
-                            Text('${pdvmList[index].projectIdName}'),
-                            ClipRRect(
-                                borderRadius: BorderRadius.circular(5.0),
-                                child: Container(
+                        return Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(children: [
+                              Text('${pdvmList[index].projectIdName}'),
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  child: Container(
                                     //color: Theme.of(context).colorScheme.background,
-                                    padding: MediaQuery.of(context).padding,
-                                    child: getTSChart('${pdvmList[index].projectIdName}'),
-                                    //child: getTSChart(),
-                                    height: 185,
-                                    width: 200))
-                          ]),
+                                      padding: MediaQuery.of(context).padding,
+                                      child: getTSChart('${pdvmList[index].projectIdName}'),
+                                      //child: getTSChart(),
+                                      height: 200,
+                                      width: 300))
+                            ]),
+                          ),
                         );
                       },
                     ),
@@ -388,54 +385,66 @@ class _HomeState extends State<Home> {
                 future: getTSData(),
                 builder: (context, AsyncSnapshot snapshot) {
 //                if (!snapshot.hasData) {
-                  if (tsvmList.length ==0) {
-                    return Container(
+                  if (tsvmList.isEmpty) {
+                    return const SizedBox(
                       height: 500,
-                      child: const Text("Wait till data loads else create Timesheet!"),
+                      child: Text("If no data create Timesheet!"),
                     );
                   } else {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                            leading: Checkbox(
-                              value: snapshot.data[index].isDelete,
-                              onChanged: (bool? newValue) {
-                                setState(() {
-                                  tsvmList[index].isDelete = newValue!;
-                                  debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
-                                });
-                              },
-                            ),
-                            title: Column(children: [
-                              Row(
-                                children: [
-                                  const Text("Project: ", style: TextStyle(fontSize: 13.0)),
-                                  Text("${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
-                                      style: const TextStyle(fontSize: 15.0)),
-                                ],
+                    return Card(
+                      child: ListView.separated(
+                        separatorBuilder: (context, index) {
+                          return const SizedBox(height: 8);
+                        },
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.length,
+                        padding:  const EdgeInsets.all(8.0),
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            tileColor: Colors.tealAccent,
+                              leading: Checkbox(
+                                value: tsvmList[index].isDelete,
+                                onChanged: (bool? newValue) {
+                                  setState(() {
+                                    tsvmList[index].isDelete = newValue!;
+                                    debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
+                                  });
+                                },
                               ),
-                              Row(
-                                children: [
-                                  const Text("Date: ", style: TextStyle(fontSize: 15.0)),
-                                  Text(snapshot.data[index].tsModel.selectedDateStr, style: const TextStyle(fontSize: 15.0)),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
-                                  Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
-                                      style: const TextStyle(fontSize: 14.0, color: Colors.green, fontWeight: FontWeight.bold))
-                                ],
-                              )
-                            ]),
-                            subtitle: Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.green)),
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
-                              //Navigator.pushReplacementNamed(context, '/');
-                            });
-                      },
+                              title: Column(children: [
+                                Row(
+                                  children: [
+                                    const Text("Date: ", style: TextStyle(fontSize: 15.0)),
+                                    Expanded(
+                                        child: Text(formatDate(snapshot.data[index].tsModel.selectedDate), style: const TextStyle(fontSize: 15.0))),
+
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Text("Project: ", style: TextStyle(fontSize: 15.0)),
+                                    Expanded(
+                                        child: Text(
+                                            "${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
+                                            style: const TextStyle(fontSize: 15.0))),
+                                  ],),
+                                Row(
+                                  children: [
+                                    const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
+                                    Expanded(
+                                        child: Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
+                                            style: const TextStyle(fontSize: 14.0, color: Colors.blueAccent, fontWeight: FontWeight.bold)))
+                                  ],
+                                )
+                              ]),
+                              subtitle:
+                              Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.blueAccent)),
+                              onTap: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
+                                //Navigator.pushReplacementNamed(context, '/');
+                              });
+                        },
+                      ),
                     );
                   }
                 },

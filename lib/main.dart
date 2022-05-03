@@ -7,7 +7,7 @@ import 'package:timestory_back4app/converters/UserParseObjectConverter.dart';
 import 'package:timestory_back4app/model/UserDataModel.dart';
 import 'package:timestory_back4app/views/PageRoutes.dart';
 import 'package:timestory_back4app/views/Login.dart';
-import 'package:timestory_back4app/views/Home.dart';
+import 'package:timestory_back4app/views/TimeSheet.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
 import 'package:timestory_back4app/views/Profile.dart';
 import 'views/SideNavigation.dart';
@@ -89,7 +89,7 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
         ),
         routes: {
           PageRoutes.login: (context) => const Login(),
-          PageRoutes.home: (context) => Home(),
+          PageRoutes.home: (context) => TimeSheet(),
           PageRoutes.expenses: (context) => Expenses(),
           PageRoutes.profile: (context) => Profile(),
         });

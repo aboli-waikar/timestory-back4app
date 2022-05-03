@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:timestory_back4app/model/UserDataModel.dart';
 import 'package:timestory_back4app/views/Expenses.dart';
-import 'package:timestory_back4app/views/Home.dart';
+import 'package:timestory_back4app/views/TimeSheet.dart';
 import 'package:timestory_back4app/views/Projects.dart';
 import 'package:timestory_back4app/views/QuickAdd.dart';
 
@@ -22,7 +22,7 @@ class _SideNavigationPageState extends State<SideNavigationPage> {
 
 
   final List _widgetClasses = [
-    Home(),
+    TimeSheet(),
     Expenses(),
     Projects(),
     QuickAdd(),
