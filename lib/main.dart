@@ -72,7 +72,7 @@ class _TimeStoryAppState extends State<TimeStoryApp> {
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ButtonStyle(
               fixedSize: MaterialStateProperty.all<Size>(const Size.fromWidth(80)),
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
+              //backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrange),
               shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))),
             ),
           ),

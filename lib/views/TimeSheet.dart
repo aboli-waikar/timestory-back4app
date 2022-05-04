@@ -152,7 +152,7 @@ class _TimeSheetState extends State<TimeSheet> {
       _myData = tsModelList
           .where((tsModel) => getMonth(tsModel.selectedDate) == getMonth(selectedMonth))
           .toList()
-      //.where((tsModel) => ProjectDataViewModel(tsModel.projectDM).projectIdName == selectedProject)
+          //.where((tsModel) => ProjectDataViewModel(tsModel.projectDM).projectIdName == selectedProject)
           .map((tsModel) => ChartViewModel(tsModel.selectedDate, tsModel.numberOfHrs, "${tsModel.projectDM.projectId} - ${tsModel.projectDM.name}"))
           .toList();
     });
@@ -196,14 +196,13 @@ class _TimeSheetState extends State<TimeSheet> {
             seriesList,
             animate: true,
             defaultRenderer:
-            Charts.BarRendererConfig<DateTime>(groupingType: Charts.BarGroupingType.stacked, cornerStrategy: const Charts.ConstCornerStrategy(2)),
+                Charts.BarRendererConfig<DateTime>(groupingType: Charts.BarGroupingType.stacked, cornerStrategy: const Charts.ConstCornerStrategy(2)),
             domainAxis: const Charts.DateTimeAxisSpec(tickProviderSpec: Charts.DayTickProviderSpec(increments: [2])),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Center(
-              child: Text("$currentMonth : $totalHrs", style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold))),
+          child: Center(child: Text("$currentMonth : $totalHrs", style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold))),
         ),
       ],
     );
@@ -284,39 +283,35 @@ class _TimeSheetState extends State<TimeSheet> {
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const TimeStoryApp()), (route) => false);
   }
 
-  PreferredSize getAppBar() {
+  getAppBar() {
     debugPrint("Home:getAppBar()");
-    PreferredSize appBarWithDeleteIcon = PreferredSize(
-      preferredSize: Size(MediaQuery.of(context).size.width, 70),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text("$selectedProject", style: const TextStyle(fontSize: 16.0)),
-          IconButton(icon: const Icon(Icons.delete), onPressed: () => deleteTS(), tooltip: "DELETE"),
-          IconButton(
-              icon: const Icon(Icons.select_all_rounded),
-              onPressed: () {
-                setState(() {
-                  tsvmList.forEach((e) => e.isDelete = true);
-                });
-              },
-              tooltip: "SELECT ALL"),
-        ],
-      ),
+    AppBar appBarWithDeleteIcon = AppBar(
+      backgroundColor: Colors.deepOrange,
+      //toolbarHeight: 100,
+      title: Text("$selectedProject", style: const TextStyle(fontSize: 16.0)),
+      actions: [
+        IconButton(icon: const Icon(Icons.delete), onPressed: () => deleteTS(), tooltip: "DELETE"),
+        IconButton(
+            icon: const Icon(Icons.select_all_rounded),
+            onPressed: () {
+              setState(() {
+                tsvmList.forEach((e) => e.isDelete = true);
+              });
+            },
+            tooltip: "SELECT ALL"),
+      ],
     );
 
-    PreferredSize appBar = PreferredSize(
-        preferredSize: Size(MediaQuery.of(context).size.width, 70),
-        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          Row(
-            children: [
-              Text("$selectedProject", style: const TextStyle(fontSize: 16.0)),
-              IconButton(icon: const Icon(Icons.work_outline, color: Colors.black), onPressed: () => selectProject(), tooltip: "SELECT PROJECT"),
-              IconButton(icon: const Icon(Icons.calendar_today, color: Colors.black), onPressed: () => selectMonth(context), tooltip: "SELECT MONTH"),
-              IconButton(icon: const Icon(Icons.import_export_sharp, color: Colors.black), onPressed: () => exportTS(), tooltip: "EXPORT"),
-            ],
-          ),
-        ]));
+    AppBar appBar = AppBar(
+      backgroundColor: Colors.deepOrange,
+      //toolbarHeight: 100,
+      title: Text("$selectedProject", style: const TextStyle(fontSize: 16.0)),
+      actions: [
+        IconButton(icon: const Icon(Icons.work_outline, color: Colors.black), onPressed: () => selectProject(), tooltip: "SELECT PROJECT"),
+        IconButton(icon: const Icon(Icons.calendar_today, color: Colors.black), onPressed: () => selectMonth(context), tooltip: "SELECT MONTH"),
+        IconButton(icon: const Icon(Icons.import_export_sharp, color: Colors.black), onPressed: () => exportTS(), tooltip: "EXPORT"),
+      ],
+    );
 
     if (tsvmList.any((element) => element.isDelete == true)) {
       return appBarWithDeleteIcon;
@@ -329,128 +324,135 @@ class _TimeSheetState extends State<TimeSheet> {
   Widget build(BuildContext context) {
     debugPrint("In Build Widget");
     return Scaffold(
-        appBar: getAppBar(),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Expanded(
-                flex: 0,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Number of Records: ${tsvmList.length}", style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                        //Text("Month: ${getMonthStr(selectedMonth)}",style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+      appBar: getAppBar(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Expanded(
+              flex: 0,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Number of Records: ${tsvmList.length}", style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                      //Text("Month: ${getMonthStr(selectedMonth)}",style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
+                    ],
                   ),
                 ),
               ),
-              ListView(
-                shrinkWrap: true,
-                children: [
-                  SizedBox(
-                    height: 240,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: pdvmList.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(children: [
-                              Text('${pdvmList[index].projectIdName}'),
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  child: Container(
+            ),
+            ListView(
+              shrinkWrap: true,
+              children: [
+                SizedBox(
+                  height: 240,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: pdvmList.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(children: [
+                            Text('${pdvmList[index].projectIdName}'),
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(5.0),
+                                child: Container(
                                     //color: Theme.of(context).colorScheme.background,
-                                      padding: MediaQuery.of(context).padding,
-                                      child: getTSChart('${pdvmList[index].projectIdName}'),
-                                      //child: getTSChart(),
-                                      height: 200,
-                                      width: 300))
+                                    padding: MediaQuery.of(context).padding,
+                                    child: getTSChart('${pdvmList[index].projectIdName}'),
+                                    //child: getTSChart(),
+                                    height: 200,
+                                    width: 300))
+                          ]),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            FutureBuilder<List<TimeSheetViewModel>>(
+              future: getTSData(),
+              builder: (context, AsyncSnapshot snapshot) {
+//                if (!snapshot.hasData) {
+                if (tsvmList.isEmpty) {
+                  return const SizedBox(
+                    height: 500,
+                    child: Text("If no data create Timesheet!"),
+                  );
+                } else {
+                  return Card(
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(height: 8);
+                      },
+                      shrinkWrap: true,
+                      itemCount: snapshot.data.length,
+                      padding: const EdgeInsets.all(8.0),
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                            //tileColor: Colors.tealAccent,
+                            leading: Checkbox(
+                              value: tsvmList[index].isDelete,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  tsvmList[index].isDelete = newValue!;
+                                  debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
+                                });
+                              },
+                            ),
+                            title: Column(children: [
+                              Row(
+                                children: [
+                                  const Text("Date: ", style: TextStyle(fontSize: 15.0)),
+                                  Expanded(
+                                      child: Text(formatDate(snapshot.data[index].tsModel.selectedDate), style: const TextStyle(fontSize: 15.0))),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text("Project: ", style: TextStyle(fontSize: 15.0)),
+                                  Expanded(
+                                      child: Text(
+                                          "${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
+                                          style: const TextStyle(fontSize: 15.0))),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
+                                  Expanded(
+                                      child: Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
+                                          style: const TextStyle(fontSize: 14.0, color: Colors.blueAccent, fontWeight: FontWeight.bold)))
+                                ],
+                              )
                             ]),
-                          ),
-                        );
+                            subtitle:
+                                Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.blueAccent)),
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
+                              //Navigator.pushReplacementNamed(context, '/');
+                            });
                       },
                     ),
-                  ),
-                ],
-              ),
-              FutureBuilder<List<TimeSheetViewModel>>(
-                future: getTSData(),
-                builder: (context, AsyncSnapshot snapshot) {
-//                if (!snapshot.hasData) {
-                  if (tsvmList.isEmpty) {
-                    return const SizedBox(
-                      height: 500,
-                      child: Text("If no data create Timesheet!"),
-                    );
-                  } else {
-                    return Card(
-                      child: ListView.separated(
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(height: 8);
-                        },
-                        shrinkWrap: true,
-                        itemCount: snapshot.data.length,
-                        padding:  const EdgeInsets.all(8.0),
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            tileColor: Colors.tealAccent,
-                              leading: Checkbox(
-                                value: tsvmList[index].isDelete,
-                                onChanged: (bool? newValue) {
-                                  setState(() {
-                                    tsvmList[index].isDelete = newValue!;
-                                    debugPrint('****TsId selected: ${tsvmList[index].tsModel.objectId}');
-                                  });
-                                },
-                              ),
-                              title: Column(children: [
-                                Row(
-                                  children: [
-                                    const Text("Date: ", style: TextStyle(fontSize: 15.0)),
-                                    Expanded(
-                                        child: Text(formatDate(snapshot.data[index].tsModel.selectedDate), style: const TextStyle(fontSize: 15.0))),
-
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Text("Project: ", style: TextStyle(fontSize: 15.0)),
-                                    Expanded(
-                                        child: Text(
-                                            "${snapshot.data[index].tsModel.projectDM.projectId} - ${snapshot.data[index].tsModel.projectDM.name}",
-                                            style: const TextStyle(fontSize: 15.0))),
-                                  ],),
-                                Row(
-                                  children: [
-                                    const Text("Hours Spent: ", style: TextStyle(fontSize: 15.0)),
-                                    Expanded(
-                                        child: Text(getHrsMin(getMins(snapshot.data[index].tsModel.numberOfHrs)),
-                                            style: const TextStyle(fontSize: 14.0, color: Colors.blueAccent, fontWeight: FontWeight.bold)))
-                                  ],
-                                )
-                              ]),
-                              subtitle:
-                              Text(snapshot.data[index].tsModel.workDescription, style: const TextStyle(fontSize: 14.0, color: Colors.blueAccent)),
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet(snapshot.data[index].tsModel)));
-                                //Navigator.pushReplacementNamed(context, '/');
-                              });
-                        },
-                      ),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-        ));
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => InsertUpdateTimeSheet.defaultModel()));
+          },
+          child: Icon(Icons.add),
+          backgroundColor: Colors.deepOrange),
+    );
   }
 }

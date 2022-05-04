@@ -19,8 +19,6 @@ class SideNavigationPage extends StatefulWidget {
 }
 
 class _SideNavigationPageState extends State<SideNavigationPage> {
-
-
   final List _widgetClasses = [
     TimeSheet(),
     Expenses(),
@@ -35,12 +33,17 @@ class _SideNavigationPageState extends State<SideNavigationPage> {
       body: Row(
         children: [
           SideNavigationBar(
+            theme: const SideNavigationBarTheme(
+                backgroundColor: Colors.black,
+                itemTheme: SideNavigationBarItemTheme(selectedItemColor: Colors.deepOrange, unselectedItemColor: Colors.white),
+                dividerTheme: SideNavigationBarDividerTheme(showMainDivider: true, showHeaderDivider: false, showFooterDivider: true),
+                togglerTheme: SideNavigationBarTogglerTheme(shrinkIconColor: Colors.brown)),
             header: SideNavigationBarHeader(
                 image: (widget.timeStoryUser.photoUrl != null)
-                    ? Image(image: NetworkImage(widget.timeStoryUser.photoUrl), fit: BoxFit.cover)
+                    ? Image(image: NetworkImage(widget.timeStoryUser.photoUrl), fit: BoxFit.cover, height: 70)
                     : CircleAvatar(child: Icon(Icons.account_balance)),
-                title: Text(widget.timeStoryUser.username),
-                subtitle: Text(widget.timeStoryUser.email)),
+                title: Text(widget.timeStoryUser.username, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                subtitle: Text(widget.timeStoryUser.email, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
             selectedIndex: widget.index,
             onTap: (index) {
               setState(() {
@@ -50,8 +53,8 @@ class _SideNavigationPageState extends State<SideNavigationPage> {
             },
             items: const [
               SideNavigationBarItem(
-                icon: Icons.home,
-                label: 'Home',
+                icon: Icons.watch_later_outlined,
+                label: 'Timesheet',
               ),
               SideNavigationBarItem(
                 icon: Icons.money_outlined,
